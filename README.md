@@ -1,4 +1,4 @@
-# ReelBrief — AI Video Summarizer
+# AI Video Summarizer
 
 Paste a YouTube URL or upload a local video/audio file. The app grabs a transcript, then writes an overview, key points, chapters, and quotes.
 
@@ -11,7 +11,7 @@ Paste a YouTube URL or upload a local video/audio file. The app grabs a transcri
 ## Setup
 
 ```bash
-cd "c:\Users\avadh\OneDrive\Documents\anu\ai video sumerizer"
+cd "c:\Users\avadh\OneDrive\Documents\anu\AI video Summarizer"
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt

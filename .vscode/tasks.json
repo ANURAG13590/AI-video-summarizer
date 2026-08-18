@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run AI Video Summarizer",
+			"type": "shell",
+			"command": "powershell -NoProfile -Command \"Set-Location 'c:\\Users\\avadh\\OneDrive\\Documents\\anu\\Ai video summerizer'; .\\.venv\\Scripts\\python.exe -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload\"",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

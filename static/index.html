@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReelBrief — AI Video Summarizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="top">
+      <div class="brand">
+        <span class="mark"></span>
+        ReelBrief
+      </div>
+      <p class="status" id="engineStatus">Checking engine…</p>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="kicker">Watch less. Keep the point.</p>
+        <h1>Turn long videos into a clear brief.</h1>
+        <p class="lede">
+          Paste a YouTube link or drop a local file. ReelBrief pulls the transcript,
+          then writes an overview, bullets, chapters, and quotes.
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="url" type="button">YouTube URL</button>
+          <button class="tab" data-tab="file" type="button">Upload file</button>
+        </div>
+
+        <form id="urlForm" class="form">
+          <label for="url">Video link</label>
+          <input
+            id="url"
+            name="url"
+            type="url"
+            placeholder="https://www.youtube.com/watch?v=…"
+            required
+          />
+          <div class="row">
+            <fieldset>
+              <legend>Summary style</legend>
+              <label><input type="radio" name="style" value="brief" checked /> Brief</label>
+              <label><input type="radio" name="style" value="detailed" /> Detailed</label>
+              <label><input type="radio" name="style" value="bullets" /> Bullets</label>
+              <label><input type="radio" name="style" value="chapters" /> Chapters</label>
+            </fieldset>
+            <button class="go" type="submit">Summarize</button>
+          </div>
+        </form>
+
+        <form id="fileForm" class="form hidden">
+          <label for="file">Video or audio file</label>
+          <input id="file" name="file" type="file" accept="video/*,audio/*" required />
+          <p class="hint">mp4, mkv, mov, mp3, wav, m4a — video files need FFmpeg installed.</p>
+          <div class="row">
+            <fieldset>
+              <legend>Summary style</legend>
+              <label><input type="radio" name="fileStyle" value="brief" checked /> Brief</label>
+              <label><input type="radio" name="fileStyle" value="detailed" /> Detailed</label>
+              <label><input type="radio" name="fileStyle" value="bullets" /> Bullets</label>
+              <label><input type="radio" name="fileStyle" value="chapters" /> Chapters</label>
+            </fieldset>
+            <button class="go" type="submit">Summarize</button>
+          </div>
+        </form>
+      </section>
+
+      <p class="progress hidden" id="progress">Working — this can take a minute for long videos.</p>
+      <p class="error hidden" id="error"></p>
+
+      <section class="result hidden" id="result">
+        <div class="meta">
+          <img id="thumb" alt="" hidden />
+          <div>
+            <h2 id="title"></h2>
+            <p class="sub" id="sub"></p>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" id="copyBtn">Copy summary</button>
+          <button type="button" id="downloadBtn">Download .md</button>
+        </div>
+        <article>
+          <h3>Overview</h3>
+          <p id="overview"></p>
+          <h3>Key points</h3>
+          <ul id="bullets"></ul>
+          <div id="chaptersWrap" class="hidden">
+            <h3>Chapters</h3>
+            <ol id="chapters"></ol>
+          </div>
+          <div id="quotesWrap" class="hidden">
+            <h3>Quotes</h3>
+            <ul id="quotes"></ul>
+          </div>
+          <details>
+            <summary>Full transcript</summary>
+            <pre id="transcript"></pre>
+          </details>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      Local app. YouTube captions are used first; Whisper runs only when needed.
+    </footer>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

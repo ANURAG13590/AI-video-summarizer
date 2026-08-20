@@ -43,8 +43,11 @@
           <input
             id="url"
             name="url"
-            type="url"
-            placeholder="https://www.youtube.com/watch?v=…"
+            type="text"
+            inputmode="url"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="https://www.youtube.com/watch?v=… or youtu.be/…"
             required
           />
           <div class="row">
@@ -76,7 +79,7 @@
         </form>
       </section>
 
-      <p class="progress hidden" id="progress">Working — this can take a minute for long videos.</p>
+      <p class="progress hidden" id="progress" aria-live="polite">Working — this can take a minute for long videos.</p>
       <p class="error hidden" id="error"></p>
 
       <section class="result hidden" id="result">

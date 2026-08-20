@@ -134,7 +134,38 @@ function friendlyError(err) {
   ) {
     return "Connection failed. The app server is not running. In this folder run: uvicorn app:app --host 127.0.0.1 --port 8000 then open http://127.0.0.1:8000";
   }
+  if (/403|access denied|network settings/i.test(message)) {
+    return "Groq/OpenAI blocked this request (403). Check your API key in .env, or try another network/VPN. Captions may still work if the server falls back to a basic summary.";
+  }
+  if (/valid YouTube URL/i.test(message)) {
+    return message + " Paste the full link from the address bar or Share button.";
+  }
   return message;
+}
+
+function normalizeYouTubeInput(raw) {
+  let text = raw.trim().replace(/^[\s<(\[{]+|[\s>)\]}]+$/g, "");
+  const httpMatch = text.match(
+    /https?:\/\/(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)\/\S+/i
+  );
+  if (httpMatch) return httpMatch[0];
+
+  const bareMatch = text.match(
+    /(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)\/\S+/i
+  );
+  if (bareMatch) return `https://${bareMatch[0].replace(/^\/+/, "")}`;
+
+  if (/^https?:\/\//i.test(text)) return text;
+  if (/^(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)\//i.test(text)) {
+    return `https://${text.replace(/^\/+/, "")}`;
+  }
+  return text;
+}
+
+function looksLikeYouTubeUrl(value) {
+  const normalized = normalizeYouTubeInput(value);
+  if (/^[A-Za-z0-9_-]{11}$/.test(normalized)) return true;
+  return /(?:youtube(?:-nocookie)?\.com|youtu\.be)/i.test(normalized);
 }
 
 async function postJson(url, body) {
@@ -150,11 +181,17 @@ async function postJson(url, body) {
 
 urlForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-    setBusy(true, "Fetching captions (no big download) and writing the summary…");
+  const rawUrl = document.getElementById("url").value;
+  const url = normalizeYouTubeInput(rawUrl);
+  if (!looksLikeYouTubeUrl(url)) {
+    showError("Paste a YouTube link (watch, shorts, or youtu.be). Example: https://www.youtube.com/watch?v=…");
+    return;
+  }
+  setBusy(true, "Fetching captions and writing the summary — long videos without subtitles can take a few minutes…");
   try {
     const style = urlForm.querySelector('input[name="style"]:checked').value;
     const data = await postJson("/api/summarize-url", {
-      url: document.getElementById("url").value,
+      url,
       style,
     });
     render(data);

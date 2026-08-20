@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from pipeline import AUDIO_EXTS, VIDEO_EXTS, summarize_upload, summarize_youtube
+from pipeline import AUDIO_EXTS, VIDEO_EXTS, normalize_youtube_input, summarize_upload, summarize_youtube
 
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
@@ -59,7 +59,7 @@ def health():
 def api_summarize_url(body: UrlRequest):
     style = body.style if body.style in {"brief", "detailed", "bullets", "chapters"} else "brief"
     try:
-        return summarize_youtube(body.url.strip(), style)
+        return summarize_youtube(normalize_youtube_input(body.url.strip()), style)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:

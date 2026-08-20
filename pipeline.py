@@ -16,31 +16,67 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
 YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
+YOUTUBE_ID_IN_TEXT_RE = re.compile(
+    r"(?:youtu\.be/|youtube(?:-nocookie)?\.com/(?:watch\?(?:[^&\s]+&)*v=|embed/|shorts/|live/|v/))([A-Za-z0-9_-]{11})"
+)
 
 AUDIO_EXTS = {".mp3", ".wav", ".m4a", ".ogg", ".flac", ".webm", ".aac"}
 VIDEO_EXTS = {".mp4", ".mkv", ".mov", ".avi", ".mpeg", ".mpg", ".m4v"}
 
 
+def normalize_youtube_input(raw: str) -> str:
+    """Clean pasted share text and ensure a parseable URL scheme."""
+    text = raw.strip().strip("<>()[]{}\"'")
+    if not text:
+        return text
+
+    match = re.search(
+        r"https?://(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)/[^\s<>\"']+",
+        text,
+        re.IGNORECASE,
+    )
+    if match:
+        return match.group(0)
+
+    match = re.search(
+        r"(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)/[^\s<>\"']+",
+        text,
+        re.IGNORECASE,
+    )
+    if match:
+        return f"https://{match.group(0).lstrip('/')}"
+
+    if re.match(r"https?://", text, re.IGNORECASE):
+        return text
+    if re.match(r"(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)/", text, re.IGNORECASE):
+        return f"https://{text.lstrip('/')}"
+    return text
+
+
 def extract_video_id(url: str) -> str | None:
-    url = url.strip()
+    url = normalize_youtube_input(url)
     if YOUTUBE_ID_RE.match(url):
         return url
 
     parsed = urlparse(url)
-    host = (parsed.hostname or "").lower().replace("www.", "")
+    host = (parsed.hostname or "").lower().removeprefix("www.")
 
     if host == "youtu.be":
-        candidate = parsed.path.lstrip("/").split("/")[0]
+        candidate = parsed.path.lstrip("/").split("/")[0].split("?")[0]
         return candidate if YOUTUBE_ID_RE.match(candidate) else None
 
-    if host in {"youtube.com", "m.youtube.com", "music.youtube.com"}:
-        if parsed.path == "/watch":
+    if host in {"youtube.com", "m.youtube.com", "music.youtube.com", "youtube-nocookie.com"}:
+        if parsed.path in {"/watch", "/watch/"}:
             vid = parse_qs(parsed.query).get("v", [None])[0]
             return vid if vid and YOUTUBE_ID_RE.match(vid) else None
         parts = [p for p in parsed.path.split("/") if p]
         if len(parts) >= 2 and parts[0] in {"embed", "shorts", "live", "v"}:
-            candidate = parts[1]
+            candidate = parts[1].split("?")[0]
             return candidate if YOUTUBE_ID_RE.match(candidate) else None
+
+    match = YOUTUBE_ID_IN_TEXT_RE.search(url)
+    if match:
+        return match.group(1)
 
     return None
 
@@ -166,6 +202,18 @@ def _chunk_text(text: str, max_chars: int = 12000) -> list[str]:
     return chunks
 
 
+def _extractive_result(transcript: str, note: str = "no API key") -> dict:
+    overview = _extractive_summary(transcript)
+    bullets = [s.strip() for s in re.split(r"(?<=[.!?])\s+", overview) if s.strip()][:8]
+    return {
+        "overview": overview,
+        "bullets": bullets,
+        "chapters": [],
+        "quotes": [],
+        "engine": f"extractive ({note})",
+    }
+
+
 def _extractive_summary(text: str, max_sentences: int = 8) -> str:
     sentences = re.split(r"(?<=[.!?])\s+", text.strip())
     sentences = [s.strip() for s in sentences if len(s.strip()) > 40]
@@ -213,7 +261,7 @@ def _chat(system: str, user: str) -> str:
         from groq import Groq
 
         client = Groq(api_key=key, timeout=120)
-        model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
         resp = client.chat.completions.create(
             model=model,
             temperature=0.3,
@@ -269,55 +317,56 @@ def summarize_transcript(
     provider, _ = _llm_available()
 
     if not provider:
-        overview = _extractive_summary(transcript)
-        bullets = [s.strip() for s in re.split(r"(?<=[.!?])\s+", overview) if s.strip()][:8]
-        return {
-            "overview": overview,
-            "bullets": bullets,
-            "chapters": [],
-            "quotes": [],
-            "engine": "extractive (no API key)",
-        }
+        return _extractive_result(transcript)
 
-    if len(chunks) == 1:
-        user = (
-            f"Video title: {title}\nStyle: {instruction}\n\n"
-            f"Transcript with timestamps:\n{timed_text}"
-        )
-        raw = _chat(system, user)
-    else:
-        partials = []
-        for i, chunk in enumerate(chunks, 1):
-            partials.append(
-                _chat(
-                    "Summarize this transcript chunk faithfully. Keep names, numbers, and claims.",
-                    f"Chunk {i}/{len(chunks)} of '{title}':\n{chunk}",
-                )
+    try:
+        if len(chunks) == 1:
+            user = (
+                f"Video title: {title}\nStyle: {instruction}\n\n"
+                f"Transcript with timestamps:\n{timed_text}"
             )
-        user = (
-            f"Video title: {title}\nStyle: {instruction}\n\n"
-            "Combine these chunk summaries into one structured JSON result.\n\n"
-            + "\n\n".join(partials)
-        )
-        raw = _chat(system, user)
+            raw = _chat(system, user)
+        else:
+            partials = []
+            for i, chunk in enumerate(chunks, 1):
+                partials.append(
+                    _chat(
+                        "Summarize this transcript chunk faithfully. Keep names, numbers, and claims.",
+                        f"Chunk {i}/{len(chunks)} of '{title}':\n{chunk}",
+                    )
+                )
+            user = (
+                f"Video title: {title}\nStyle: {instruction}\n\n"
+                "Combine these chunk summaries into one structured JSON result.\n\n"
+                + "\n\n".join(partials)
+            )
+            raw = _chat(system, user)
 
-    parsed = _parse_json_object(raw)
-    if not parsed:
+        parsed = _parse_json_object(raw)
+        if not parsed:
+            return {
+                "overview": raw,
+                "bullets": [],
+                "chapters": [],
+                "quotes": [],
+                "engine": provider,
+            }
+
         return {
-            "overview": raw,
-            "bullets": [],
-            "chapters": [],
-            "quotes": [],
+            "overview": parsed.get("overview") or raw,
+            "bullets": parsed.get("bullets") or [],
+            "chapters": parsed.get("chapters") or [],
+            "quotes": parsed.get("quotes") or [],
             "engine": provider,
         }
-
-    return {
-        "overview": parsed.get("overview") or raw,
-        "bullets": parsed.get("bullets") or [],
-        "chapters": parsed.get("chapters") or [],
-        "quotes": parsed.get("quotes") or [],
-        "engine": provider,
-    }
+    except Exception as exc:
+        note = f"{provider} unreachable - using basic summary"
+        err = str(exc).lower()
+        if "403" in err or "access denied" in err:
+            note = f"{provider} blocked this network - using basic summary"
+        elif "timeout" in err or "timed out" in err:
+            note = f"{provider} timed out - using basic summary"
+        return _extractive_result(transcript, note)
 
 
 def _parse_json_object(text: str) -> dict | None:
@@ -342,7 +391,55 @@ def _parse_json_object(text: str) -> dict | None:
 def _which_ffmpeg() -> str | None:
     from shutil import which
 
-    return which("ffmpeg")
+    path = which("ffmpeg")
+    if path:
+        return path
+    try:
+        import imageio_ffmpeg
+
+        bundled = imageio_ffmpeg.get_ffmpeg_exe()
+        if bundled and Path(bundled).is_file():
+            return bundled
+    except Exception:
+        pass
+    return None
+
+
+def _prepare_audio_for_whisper(source: Path, dest_dir: Path) -> Path:
+    """Return audio small enough for Groq/OpenAI Whisper (25 MB limit)."""
+    if source.suffix.lower() in AUDIO_EXTS and source.stat().st_size <= 24 * 1024 * 1024:
+        return source
+
+    ffmpeg = _which_ffmpeg()
+    if not ffmpeg:
+        if source.stat().st_size <= 24 * 1024 * 1024:
+            return source
+        raise RuntimeError(
+            "Downloaded audio is too large to transcribe (25 MB limit). "
+            "Install FFmpeg, or try a shorter video."
+        )
+
+    dest = dest_dir / "whisper.mp3"
+    cmd = [
+        ffmpeg,
+        "-y",
+        "-i",
+        str(source),
+        "-vn",
+        "-ac",
+        "1",
+        "-ar",
+        "16000",
+        "-b:a",
+        "48k",
+        str(dest),
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0 or not dest.exists():
+        if source.stat().st_size <= 24 * 1024 * 1024:
+            return source
+        raise RuntimeError("Could not compress audio for transcription.")
+    return dest
 
 
 def extract_audio(source: Path, dest_dir: Path) -> Path:
@@ -475,11 +572,6 @@ def _ytdlp_base_opts(**extra) -> dict:
         "no_warnings": True,
         "noprogress": True,
         "ignoreerrors": True,
-        "extractor_args": {
-            "youtube": {
-                "player_client": ["android", "web"],
-            }
-        },
         **extra,
     }
     cookies_file = os.getenv("YTDLP_COOKIES_FILE", "").strip()
@@ -488,15 +580,61 @@ def _ytdlp_base_opts(**extra) -> dict:
         opts["cookiefile"] = cookies_file
     elif cookies_browser:
         opts["cookiesfrombrowser"] = (cookies_browser,)
+
+    ffmpeg = _which_ffmpeg()
+    if ffmpeg:
+        opts["ffmpeg_location"] = str(Path(ffmpeg).parent)
     return opts
 
 
-def fetch_ytdlp_captions(url: str) -> tuple[str, list[dict]]:
+def _ytdlp_attempts(**extra) -> list[dict]:
+    """Try smaller web formats first, then android fallback for bot-blocked IPs."""
+    shared = _ytdlp_base_opts(
+        socket_timeout=120,
+        retries=10,
+        fragment_retries=10,
+        **extra,
+    )
+    return [
+        {
+            **shared,
+            "format": extra.get(
+                "format",
+                "140/139/249/251/ba/b/bestaudio/best/worstaudio/worst",
+            ),
+            "extractor_args": {"youtube": {"player_client": ["web", "android"]}},
+        },
+        {
+            **shared,
+            "format": extra.get(
+                "format",
+                "bestaudio/best/worstaudio/worst/ba/b",
+            ),
+            "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+        },
+    ]
+
+
+def _run_ytdlp(info_or_download: str, url: str, **extra):
     import yt_dlp
 
-    opts = _ytdlp_base_opts(skip_download=True)
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        info = ydl.extract_info(url, download=False)
+    last_error: Exception | None = None
+    for opts in _ytdlp_attempts(**extra):
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                if info_or_download == "download":
+                    ydl.download([url])
+                    return opts
+                return ydl.extract_info(url, download=False)
+        except Exception as exc:
+            last_error = exc
+    if last_error:
+        raise last_error
+    raise RuntimeError("yt-dlp could not read this YouTube URL.")
+
+
+def fetch_ytdlp_captions(url: str) -> tuple[str, list[dict]]:
+    info = _run_ytdlp("info", url, skip_download=True)
     if not info:
         raise RuntimeError("yt-dlp could not read this YouTube URL.")
 
@@ -531,34 +669,19 @@ def fetch_ytdlp_captions(url: str) -> tuple[str, list[dict]]:
 
 def download_youtube_audio(url: str, dest_dir: Path) -> Path:
     try:
-        import yt_dlp
+        import yt_dlp  # noqa: F401
     except ImportError as exc:
         raise RuntimeError(
             "yt-dlp is required to download YouTube audio when captions are missing."
         ) from exc
 
     outtmpl = str(dest_dir / "source.%(ext)s")
-    opts = _ytdlp_base_opts(
-        format="bestaudio[ext=m4a]/bestaudio[ext=mp3]/bestaudio[filesize<20000000]/worstaudio/bestaudio",
-        outtmpl=outtmpl,
-        socket_timeout=30,
-    )
-    ffmpeg = _which_ffmpeg()
-    if ffmpeg:
-        opts["postprocessors"] = [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "48",
-            }
-        ]
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        ydl.download([url])
+    _run_ytdlp("download", url, outtmpl=outtmpl, socket_timeout=30)
 
     mp3 = dest_dir / "source.mp3"
     if mp3.exists():
         return mp3
-    matches = list(dest_dir.glob("source.*"))
+    matches = sorted(dest_dir.glob("source.*"), key=lambda p: p.stat().st_size, reverse=True)
     if matches:
         return matches[0]
     raise RuntimeError("Could not download audio from YouTube.")
@@ -598,19 +721,26 @@ def summarize_youtube(url: str, style: str) -> dict:
             )
         try:
             with tempfile.TemporaryDirectory() as tmp:
-                audio = download_youtube_audio(canonical, Path(tmp))
-                if audio.stat().st_size > 24 * 1024 * 1024:
-                    raise RuntimeError(
-                        "Audio is larger than Groq Whisper allows (25 MB). "
-                        "Install FFmpeg so the app can compress it, or use a shorter video."
-                    )
+                tmp_path = Path(tmp)
+                audio = download_youtube_audio(canonical, tmp_path)
+                audio = _prepare_audio_for_whisper(audio, tmp_path)
                 transcript, timed = transcribe_audio_file(audio)
             source = "whisper"
         except Exception as whisper_error:
-            raise RuntimeError(
-                "Could not get a transcript for this video. "
-                + " | ".join(errors + [f"audio: {whisper_error}"])
-            ) from whisper_error
+            message = str(whisper_error)
+            if "blocked" in message.lower() or "bot" in message.lower():
+                hint = (
+                    "YouTube blocked the download from this network. "
+                    "Try again later, or add YTDLP_COOKIES_BROWSER=edge to your .env file."
+                )
+            elif "25 MB" in message or "too large" in message.lower():
+                hint = message
+            else:
+                hint = (
+                    "This video has no captions, and audio transcription failed. "
+                    "Try a shorter video, or one with subtitles enabled."
+                )
+            raise RuntimeError(hint) from whisper_error
 
     if not transcript:
         raise RuntimeError("The transcript came back empty.")

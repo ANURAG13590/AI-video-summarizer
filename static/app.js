@@ -1,12 +1,17 @@
-const urlForm = document.getElementById("urlForm");
-const fileForm = document.getElementById("fileForm");
-const progress = document.getElementById("progress");
-const errorEl = document.getElementById("error");
-const result = document.getElementById("result");
+/* ─── DOM refs ─── */
+const urlForm      = document.getElementById("urlForm");
+const fileForm     = document.getElementById("fileForm");
+const progressWrap = document.getElementById("progressWrap");
+const progress     = document.getElementById("progress");
+const errorEl      = document.getElementById("error");
+const result       = document.getElementById("result");
 const engineStatus = document.getElementById("engineStatus");
+const dropZone     = document.getElementById("dropZone");
+const fileInput    = document.getElementById("file");
 
 let lastPayload = null;
 
+/* ─── Tab switching ─── */
 document.querySelectorAll(".tab").forEach((tab) => {
   tab.addEventListener("click", () => {
     document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
@@ -17,33 +22,103 @@ document.querySelectorAll(".tab").forEach((tab) => {
   });
 });
 
+/* ─── Hamburger menu ─── */
+const hamburger = document.getElementById("navHamburger");
+const navLinks  = document.querySelector(".nav-links");
+if (hamburger && navLinks) {
+  hamburger.addEventListener("click", () => {
+    const open = navLinks.style.display === "flex";
+    navLinks.style.cssText = open
+      ? ""
+      : "display:flex;flex-direction:column;position:absolute;top:60px;left:0;right:0;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);padding:16px 24px 24px;gap:4px;border-bottom:1px solid rgba(255,255,255,.08);z-index:99";
+  });
+}
+
+/* ─── Smooth nav shadow on scroll ─── */
+const nav = document.getElementById("nav");
+window.addEventListener("scroll", () => {
+  nav.style.background = window.scrollY > 10
+    ? "rgba(0,0,0,.88)"
+    : "rgba(0,0,0,.72)";
+}, { passive: true });
+
+/* ─── Scroll reveal ─── */
+const observer = new IntersectionObserver(
+  (entries) => entries.forEach((e) => {
+    if (e.isIntersecting) { e.target.classList.add("visible"); observer.unobserve(e.target); }
+  }),
+  { threshold: 0.12 }
+);
+document.querySelectorAll(".feature-card, .step, .card-mock").forEach((el) => {
+  el.classList.add("reveal");
+  observer.observe(el);
+});
+
+/* ─── Drag & drop on file drop zone ─── */
+if (dropZone) {
+  ["dragenter","dragover"].forEach((evt) => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+  });
+  ["dragleave","drop"].forEach((evt) => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+    });
+  });
+  dropZone.addEventListener("drop", (e) => {
+    const dt = e.dataTransfer;
+    if (dt && dt.files.length) {
+      const transfer = new DataTransfer();
+      transfer.items.add(dt.files[0]);
+      fileInput.files = transfer.files;
+      updateFileLabel(dt.files[0].name);
+    }
+  });
+}
+
+fileInput && fileInput.addEventListener("change", () => {
+  if (fileInput.files[0]) updateFileLabel(fileInput.files[0].name);
+});
+function updateFileLabel(name) {
+  const lbl = document.getElementById("fileLabel");
+  if (lbl) lbl.textContent = name;
+}
+
+/* ─── Engine health ─── */
 async function loadHealth() {
   try {
-    const res = await fetch("/api/health");
+    const res  = await fetch("/api/health");
     const data = await res.json();
-    const whisper = data.whisper ? "Whisper ready" : "captions-only (add API key for uploads)";
+    const whisper = data.whisper
+      ? "Whisper ready"
+      : "captions-only (add API key for uploads)";
     engineStatus.textContent = `Engine: ${data.llm} · ${whisper}`;
   } catch {
     engineStatus.textContent = "Engine: offline — start the server, then refresh";
   }
 }
-
 loadHealth();
 
+/* ─── Busy state ─── */
 function setBusy(busy, message) {
-  progress.classList.toggle("hidden", !busy);
-        progress.textContent = message || "Working — fetching captions and writing the summary.";
+  progressWrap.classList.toggle("hidden", !busy);
+  progress.textContent = message || "Working — fetching captions and writing the summary.";
   errorEl.classList.add("hidden");
-  urlForm.querySelector(".go").disabled = busy;
-  fileForm.querySelector(".go").disabled = busy;
+  document.querySelectorAll(".go").forEach((b) => (b.disabled = busy));
 }
 
+/* ─── Error ─── */
 function showError(message) {
   errorEl.textContent = message;
   errorEl.classList.remove("hidden");
   result.classList.add("hidden");
+  errorEl.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
+/* ─── List helper ─── */
 function fillList(el, items, mapper) {
   el.innerHTML = "";
   (items || []).forEach((item) => {
@@ -53,37 +128,38 @@ function fillList(el, items, mapper) {
   });
 }
 
+/* ─── Render result ─── */
 function render(data) {
   lastPayload = data;
   result.classList.remove("hidden");
+
   document.getElementById("title").textContent = data.title || "Summary";
-  const bits = [data.author, data.source ? `source: ${data.source}` : "", data.engine ? `model: ${data.engine}` : ""]
-    .filter(Boolean);
+  const bits = [
+    data.author,
+    data.source  ? `source: ${data.source}`  : "",
+    data.engine  ? `model: ${data.engine}`   : "",
+  ].filter(Boolean);
   document.getElementById("sub").textContent = bits.join(" · ");
 
   const thumb = document.getElementById("thumb");
-  if (data.thumbnail) {
-    thumb.src = data.thumbnail;
-    thumb.hidden = false;
-  } else {
-    thumb.hidden = true;
-  }
+  if (data.thumbnail) { thumb.src = data.thumbnail; thumb.hidden = false; }
+  else { thumb.hidden = true; }
 
   document.getElementById("overview").textContent = data.overview || "";
   fillList(document.getElementById("bullets"), data.bullets);
 
   const chaptersWrap = document.getElementById("chaptersWrap");
-  const chapters = data.chapters || [];
+  const chapters     = data.chapters || [];
   chaptersWrap.classList.toggle("hidden", chapters.length === 0);
   fillList(document.getElementById("chapters"), chapters, (ch) => {
-    const ts = ch.timestamp || ch.start || "";
-    const title = ch.title || "";
+    const ts     = ch.timestamp || ch.start || "";
+    const title  = ch.title || "";
     const detail = ch.detail || ch.description || "";
     return [ts, title, detail].filter(Boolean).join(" — ");
   });
 
   const quotesWrap = document.getElementById("quotesWrap");
-  const quotes = data.quotes || [];
+  const quotes     = data.quotes || [];
   quotesWrap.classList.toggle("hidden", quotes.length === 0);
   fillList(document.getElementById("quotes"), quotes);
 
@@ -91,6 +167,7 @@ function render(data) {
   result.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+/* ─── Markdown export ─── */
 function toMarkdown(data) {
   const lines = [`# ${data.title || "Video summary"}`, ""];
   if (data.url) lines.push(`Source: ${data.url}`, "");
@@ -115,50 +192,46 @@ function toMarkdown(data) {
   return lines.join("\n");
 }
 
+/* ─── Error helpers ─── */
 function formatDetail(detail) {
   if (!detail) return "";
   if (typeof detail === "string") return detail;
-  if (Array.isArray(detail)) {
-    return detail.map((item) => item.msg || JSON.stringify(item)).join("; ");
-  }
+  if (Array.isArray(detail)) return detail.map((i) => i.msg || JSON.stringify(i)).join("; ");
   return String(detail);
 }
 
 function friendlyError(err) {
-  const message = err && err.message ? err.message : String(err);
+  const msg = err && err.message ? err.message : String(err);
   if (
-    message === "Failed to fetch" ||
-    message === "Load failed" ||
-    message === "NetworkError when attempting to fetch resource." ||
-    message.includes("NetworkError")
+    msg === "Failed to fetch" ||
+    msg === "Load failed" ||
+    msg.includes("NetworkError")
   ) {
     return "Connection failed. The app server is not running. In this folder run: uvicorn app:app --host 127.0.0.1 --port 8000 then open http://127.0.0.1:8000";
   }
-  if (/403|access denied|network settings/i.test(message)) {
-    return "Groq/OpenAI blocked this request (403). Check your API key in .env, or try another network/VPN. Captions may still work if the server falls back to a basic summary.";
+  if (/403|access denied|network settings/i.test(msg)) {
+    return "Groq/OpenAI blocked this request (403). Check your API key in .env, or try another network/VPN.";
   }
-  if (/valid YouTube URL/i.test(message)) {
-    return message + " Paste the full link from the address bar or Share button.";
+  if (/valid YouTube URL/i.test(msg)) {
+    return msg + " Paste the full link from the address bar or Share button.";
   }
-  return message;
+  return msg;
 }
 
+/* ─── URL normalisation ─── */
 function normalizeYouTubeInput(raw) {
   let text = raw.trim().replace(/^[\s<(\[{]+|[\s>)\]}]+$/g, "");
   const httpMatch = text.match(
     /https?:\/\/(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)\/\S+/i
   );
   if (httpMatch) return httpMatch[0];
-
   const bareMatch = text.match(
     /(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)\/\S+/i
   );
   if (bareMatch) return `https://${bareMatch[0].replace(/^\/+/, "")}`;
-
   if (/^https?:\/\//i.test(text)) return text;
-  if (/^(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)\//i.test(text)) {
+  if (/^(?:www\.)?(?:youtube(?:-nocookie)?\.com|youtu\.be)\//i.test(text))
     return `https://${text.replace(/^\/+/, "")}`;
-  }
   return text;
 }
 
@@ -168,8 +241,9 @@ function looksLikeYouTubeUrl(value) {
   return /(?:youtube(?:-nocookie)?\.com|youtu\.be)/i.test(normalized);
 }
 
+/* ─── API call ─── */
 async function postJson(url, body) {
-  const res = await fetch(url, {
+  const res  = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -179,21 +253,21 @@ async function postJson(url, body) {
   return data;
 }
 
+/* ─── URL form submit ─── */
 urlForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const rawUrl = document.getElementById("url").value;
-  const url = normalizeYouTubeInput(rawUrl);
+  const url    = normalizeYouTubeInput(rawUrl);
   if (!looksLikeYouTubeUrl(url)) {
-    showError("Paste a YouTube link (watch, shorts, or youtu.be). Example: https://www.youtube.com/watch?v=…");
+    showError(
+      "Paste a YouTube link (watch, shorts, or youtu.be). Example: https://www.youtube.com/watch?v=…"
+    );
     return;
   }
   setBusy(true, "Fetching captions and writing the summary — long videos without subtitles can take a few minutes…");
   try {
     const style = urlForm.querySelector('input[name="style"]:checked').value;
-    const data = await postJson("/api/summarize-url", {
-      url,
-      style,
-    });
+    const data  = await postJson("/api/summarize-url", { url, style });
     render(data);
   } catch (err) {
     showError(friendlyError(err));
@@ -202,6 +276,7 @@ urlForm.addEventListener("submit", async (event) => {
   }
 });
 
+/* ─── File form submit ─── */
 fileForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const file = document.getElementById("file").files[0];
@@ -209,10 +284,10 @@ fileForm.addEventListener("submit", async (event) => {
   setBusy(true, "Transcribing audio, then writing the brief…");
   try {
     const style = fileForm.querySelector('input[name="fileStyle"]:checked').value;
-    const form = new FormData();
+    const form  = new FormData();
     form.append("file", file);
     form.append("style", style);
-    const res = await fetch("/api/summarize-file", { method: "POST", body: form });
+    const res  = await fetch("/api/summarize-file", { method: "POST", body: form });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(formatDetail(data.detail) || "Upload failed");
     render(data);
@@ -223,20 +298,23 @@ fileForm.addEventListener("submit", async (event) => {
   }
 });
 
+/* ─── Copy ─── */
 document.getElementById("copyBtn").addEventListener("click", async () => {
   if (!lastPayload) return;
   await navigator.clipboard.writeText(toMarkdown(lastPayload));
-  document.getElementById("copyBtn").textContent = "Copied";
+  const btn = document.getElementById("copyBtn");
+  btn.textContent = "Copied!";
   setTimeout(() => {
-    document.getElementById("copyBtn").textContent = "Copy summary";
-  }, 1400);
+    btn.innerHTML = `<svg viewBox="0 0 20 20" fill="none" style="width:16px;height:16px"><path d="M8 4H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3M8 4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V4z" stroke="currentColor" stroke-width="1.5"/></svg> Copy summary`;
+  }, 1800);
 });
 
+/* ─── Download ─── */
 document.getElementById("downloadBtn").addEventListener("click", () => {
   if (!lastPayload) return;
   const blob = new Blob([toMarkdown(lastPayload)], { type: "text/markdown" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = URL.createObjectURL(blob);
   a.download = `${(lastPayload.title || "summary").replace(/[^\w\-]+/g, "_").slice(0, 60)}.md`;
   a.click();
   URL.revokeObjectURL(a.href);

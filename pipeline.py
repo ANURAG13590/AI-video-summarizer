@@ -117,7 +117,7 @@ def _snippets_to_text(snippets) -> tuple[str, list[dict]]:
     return " ".join(lines), timed
 
 
-PREFERRED_LANGS = ["en", "en-US", "en-GB", "en-IN", "hi", "hi-IN"]
+PREFERRED_LANGS = ["en", "en-US", "en-GB", "en-IN"]
 
 
 def fetch_youtube_transcript(video_id: str) -> tuple[str, list[dict]]:
@@ -126,35 +126,52 @@ def fetch_youtube_transcript(video_id: str) -> tuple[str, list[dict]]:
     api = YouTubeTranscriptApi()
     errors: list[str] = []
 
+    # 1. Try listing tracks: prefer English, or auto-translate non-English (like Hindi) to English
     try:
-        fetched = api.fetch(video_id, languages=PREFERRED_LANGS)
+        listing = api.list(video_id)
+        chosen = None
+
+        # Try to find a native English track first
+        try:
+            chosen = listing.find_transcript(["en", "en-US", "en-GB", "en-IN", "en-CA", "en-AU"])
+        except Exception:
+            pass
+
+        # If no English track, pick first available and translate to English
+        if not chosen:
+            tracks = list(listing)
+            if tracks:
+                chosen = tracks[0]
+                if chosen.is_translatable:
+                    try:
+                        chosen = chosen.translate("en")
+                    except Exception:
+                        pass
+
+        if chosen:
+            text, timed = _snippets_to_text(chosen.fetch())
+            if text:
+                return text, timed
+    except Exception as exc:
+        errors.append(f"list_transcripts: {exc}")
+
+    # 2. Try direct fetch for English
+    try:
+        fetched = api.fetch(video_id, languages=["en", "en-US", "en-GB", "en-IN"])
         text, timed = _snippets_to_text(fetched)
         if text:
             return text, timed
     except Exception as exc:
-        errors.append(str(exc))
+        errors.append(f"en_fetch: {exc}")
 
+    # 3. Fallback to any language (LLM will translate it to English during summarization)
     try:
-        listing = api.list(video_id)
-        try:
-            chosen = listing.find_transcript(PREFERRED_LANGS)
-        except Exception:
-            tracks = list(listing)
-            if not tracks:
-                raise RuntimeError("YouTube returned no caption tracks.")
-            chosen = tracks[0]
-
-        if chosen.language_code.split("-")[0] != "en" and chosen.is_translatable:
-            try:
-                chosen = chosen.translate("en")
-            except Exception:
-                pass
-
-        text, timed = _snippets_to_text(chosen.fetch())
+        fetched = api.fetch(video_id)
+        text, timed = _snippets_to_text(fetched)
         if text:
             return text, timed
     except Exception as exc:
-        errors.append(str(exc))
+        errors.append(f"any_fetch: {exc}")
 
     message = "; ".join(errors) if errors else "Could not fetch YouTube captions."
     if any("blocked" in err.lower() for err in errors):
@@ -307,10 +324,16 @@ def summarize_transcript(
     timed_text = transcript_with_timestamps(timed) if timed else transcript[:14000]
 
     system = (
-        "You summarize video transcripts faithfully. Do not invent facts. "
-        "If something is unclear from the transcript, say so. "
-        "Return JSON with keys: overview (string), bullets (array of strings), "
-        "chapters (array of {timestamp, title, detail}), quotes (array of strings)."
+        "You are an expert video summarizer. "
+        "CRITICAL LANGUAGE REQUIREMENT: Your output MUST ALWAYS BE 100% IN ENGLISH. "
+        "Even if the video, title, or transcript is in Hindi, Hinglish, or any language other than English, "
+        "you MUST TRANSLATE and summarize everything into clear, fluent, natural English. "
+        "Do not output Hindi or Devanagari script. "
+        "Do not invent facts. Faithfully capture the content. "
+        "Return valid JSON ONLY with keys: "
+        "overview (string in English), bullets (array of strings in English), "
+        "chapters (array of {timestamp, title, detail} with English title and detail), "
+        "quotes (array of key quotes translated to English)."
     )
 
     chunks = _chunk_text(transcript, 11000)
@@ -323,6 +346,7 @@ def summarize_transcript(
         if len(chunks) == 1:
             user = (
                 f"Video title: {title}\nStyle: {instruction}\n\n"
+                "LANGUAGE DIRECTIVE: Output strictly in English (translate from Hindi or any other language).\n\n"
                 f"Transcript with timestamps:\n{timed_text}"
             )
             raw = _chat(system, user)
@@ -331,13 +355,14 @@ def summarize_transcript(
             for i, chunk in enumerate(chunks, 1):
                 partials.append(
                     _chat(
-                        "Summarize this transcript chunk faithfully. Keep names, numbers, and claims.",
+                        "Summarize this transcript chunk faithfully in English. If the text is in Hindi or another language, translate to English. Keep names, numbers, and key points.",
                         f"Chunk {i}/{len(chunks)} of '{title}':\n{chunk}",
                     )
                 )
             user = (
                 f"Video title: {title}\nStyle: {instruction}\n\n"
-                "Combine these chunk summaries into one structured JSON result.\n\n"
+                "Combine these chunk summaries into one structured JSON result in English.\n"
+                "REMINDER: All fields (overview, bullets, chapters, quotes) must be in English.\n\n"
                 + "\n\n".join(partials)
             )
             raw = _chat(system, user)

@@ -88,7 +88,7 @@ function updateFileLabel(name) {
 }
 
 /* ─── API URL resolution ─── */
-const PRIMARY_TUNNEL = "https://stickers-nelson-find-modems.trycloudflare.com";
+const PRIMARY_TUNNEL = "https://future-simon-clean-sunday.trycloudflare.com";
 const FALLBACK_VERCEL = "https://ai-video-summarizer-zv8y.vercel.app";
 
 function getApiUrl(endpoint) {

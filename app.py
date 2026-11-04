@@ -28,21 +28,9 @@ except Exception:
 app = FastAPI(title="AI Video Summarizer", version="1.0.0")
 
 @app.middleware("http")
-async def fix_vercel_path(request, call_next):
-    matched = request.headers.get("x-matched-path")
-    if matched and not matched.startswith("/api/index"):
-        request.scope["path"] = matched
-    else:
-        raw_path = request.scope.get("path", "")
-        for prefix in ["/api/index.py", "/api/index"]:
-            if raw_path == prefix:
-                request.scope["path"] = "/"
-                break
-            elif raw_path.startswith(prefix + "/"):
-                request.scope["path"] = raw_path[len(prefix):]
-                break
+async def debug_path_middleware(request, call_next):
     response = await call_next(request)
-    response.headers["X-Debug-Path"] = request.scope.get("path", "")
+    response.headers["X-Debug-Path"] = request.url.path
     return response
 
 app.add_middleware(

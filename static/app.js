@@ -87,8 +87,12 @@ function updateFileLabel(name) {
   if (lbl) lbl.textContent = name;
 }
 
-/* ─── API URL resolution ─── */
-const CLOUD_BACKEND = "https://ai-video-summarizer-zv8y.vercel.app";
+/* ─── 24/7 Cloud API URL Resolution ─── */
+const CLOUD_BACKENDS = [
+  "https://ai-video-summarizer-qx.vercel.app",
+  "https://ai-video-summarizer-zv8y.vercel.app"
+];
+let activeBackend = CLOUD_BACKENDS[0];
 
 function getApiUrl(endpoint) {
   // If opened directly on Vercel or localhost, use relative path
@@ -97,40 +101,78 @@ function getApiUrl(endpoint) {
   }
   const custom = localStorage.getItem("ai_backend_url");
   if (custom) return custom.replace(/\/+$/, "") + endpoint;
-  return CLOUD_BACKEND + endpoint;
+  return activeBackend + endpoint;
 }
 
 /* ─── Engine health ─── */
 async function loadHealth() {
-  try {
-    const res  = await fetch(getApiUrl("/api/health"));
-    const data = await res.json();
-    const whisper = data.whisper
-      ? "Whisper ready"
-      : "captions-only (add API key for uploads)";
-    engineStatus.textContent = `Engine: ${data.llm} · ${whisper}`;
-    const navBadge = document.getElementById("navStatusBadge");
-    if (navBadge) navBadge.textContent = `${data.llm} Active`;
-  } catch {
-    engineStatus.innerHTML = `Engine: offline — <a href="javascript:void(0)" id="setBackendLink" style="color:var(--apple-cyan);text-decoration:underline;cursor:pointer;">Connect backend URL</a>`;
-    const navBadge = document.getElementById("navStatusBadge");
-    if (navBadge) navBadge.textContent = "Engine Offline";
-    const link = document.getElementById("setBackendLink");
-    if (link) {
-      link.onclick = (e) => {
-        e.preventDefault();
-        const current = localStorage.getItem("ai_backend_url") || "";
-        const entered = prompt("Enter your live backend URL (e.g. Cloudflare tunnel or public URL, leave blank for local):", current);
-        if (entered !== null) {
-          if (entered.trim()) {
-            localStorage.setItem("ai_backend_url", entered.trim());
-          } else {
-            localStorage.removeItem("ai_backend_url");
-          }
-          loadHealth();
-        }
-      };
+  // If not on GitHub Pages, just check local/relative
+  if (!window.location.hostname.endsWith("github.io")) {
+    try {
+      const res = await fetch("/api/health");
+      const data = await res.json();
+      updateHealthUI(data);
+      return;
+    } catch (e) {
+      // fallback
     }
+  }
+
+  // If custom backend set
+  const custom = localStorage.getItem("ai_backend_url");
+  if (custom) {
+    try {
+      const res = await fetch(custom.replace(/\/+$/, "") + "/api/health");
+      const data = await res.json();
+      updateHealthUI(data);
+      return;
+    } catch (e) {}
+  }
+
+  // Try cloud backends with auto-failover
+  for (const b of CLOUD_BACKENDS) {
+    try {
+      const res = await fetch(b + "/api/health", { signal: AbortSignal.timeout(4000) });
+      if (res.ok) {
+        const data = await res.json();
+        activeBackend = b;
+        updateHealthUI(data);
+        return;
+      }
+    } catch (err) {}
+  }
+
+  showOfflineUI();
+}
+
+function updateHealthUI(data) {
+  const whisper = data.whisper
+    ? "Whisper ready"
+    : "instant-clarity";
+  engineStatus.textContent = `Cloud Engine: ${data.llm} · 24/7 Active`;
+  const navBadge = document.getElementById("navStatusBadge");
+  if (navBadge) navBadge.textContent = `24/7 Cloud Active`;
+}
+
+function showOfflineUI() {
+  engineStatus.innerHTML = `Engine: offline — <a href="javascript:void(0)" id="setBackendLink" style="color:var(--apple-cyan);text-decoration:underline;cursor:pointer;">Connect backend URL</a>`;
+  const navBadge = document.getElementById("navStatusBadge");
+  if (navBadge) navBadge.textContent = "Engine Offline";
+  const link = document.getElementById("setBackendLink");
+  if (link) {
+    link.onclick = (e) => {
+      e.preventDefault();
+      const current = localStorage.getItem("ai_backend_url") || "";
+      const entered = prompt("Enter your live backend URL (leave blank for default 24/7 cloud):", current);
+      if (entered !== null) {
+        if (entered.trim()) {
+          localStorage.setItem("ai_backend_url", entered.trim());
+        } else {
+          localStorage.removeItem("ai_backend_url");
+        }
+        loadHealth();
+      }
+    };
   }
 }
 loadHealth();

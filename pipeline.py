@@ -86,7 +86,7 @@ def fetch_youtube_meta(url: str) -> dict:
         resp = httpx.get(
             "https://www.youtube.com/oembed",
             params={"url": url, "format": "json"},
-            timeout=8,
+            timeout=2.5,
         )
         if resp.status_code == 200:
             data = resp.json()
@@ -170,20 +170,14 @@ def fetch_youtube_transcript(video_id: str) -> tuple[str, list[dict]]:
     from youtube_transcript_api import YouTubeTranscriptApi
 
     api = YouTubeTranscriptApi(http_client=_create_fast_session())
-    errors: list[str] = []
 
-    # 1. Try listing tracks: prefer English, or auto-translate non-English (like Hindi) to English
     try:
         listing = api.list(video_id)
         chosen = None
-
-        # Try to find a native English track first
         try:
             chosen = listing.find_transcript(["en", "en-US", "en-GB", "en-IN", "en-CA", "en-AU"])
         except Exception:
             pass
-
-        # If no English track, pick first available and translate to English
         if not chosen:
             tracks = list(listing)
             if tracks:
@@ -193,42 +187,22 @@ def fetch_youtube_transcript(video_id: str) -> tuple[str, list[dict]]:
                         chosen = chosen.translate("en")
                     except Exception:
                         pass
-
         if chosen:
             text, timed = _snippets_to_text(chosen.fetch())
             if text:
                 return text, timed
-    except Exception as exc:
-        errors.append(f"list_transcripts: {exc}")
+    except Exception:
+        pass
 
-    # 2. Try direct fetch for English
-    try:
-        fetched = api.fetch(video_id, languages=["en", "en-US", "en-GB", "en-IN"])
-        text, timed = _snippets_to_text(fetched)
-        if text:
-            return text, timed
-    except Exception as exc:
-        errors.append(f"en_fetch: {exc}")
-
-    # 3. Fallback to any language
     try:
         fetched = api.fetch(video_id)
         text, timed = _snippets_to_text(fetched)
         if text:
             return text, timed
     except Exception as exc:
-        errors.append(f"any_fetch: {exc}")
+        raise RuntimeError(f"Caption error: {exc}")
 
-    # 4. Fast proxy fallback
-    try:
-        proxy_text, proxy_timed = _fetch_via_proxies(video_id)
-        if proxy_text:
-            return proxy_text, proxy_timed
-    except Exception:
-        pass
-
-    message = "; ".join(errors) if errors else "Could not fetch YouTube captions."
-    raise RuntimeError(message)
+    raise RuntimeError("No transcript found.")
 
 
 def format_timestamp(seconds: float) -> str:
@@ -713,14 +687,12 @@ def _ytdlp_base_opts(**extra) -> dict:
 
 
 def _ytdlp_attempts(**extra) -> list[dict]:
-    """Android client first to bypass datacenter/cloud IP blocks, then mweb/tv."""
-    socket_timeout = extra.pop("socket_timeout", 8)
-    retries = extra.pop("retries", 1)
-    fragment_retries = extra.pop("fragment_retries", 1)
+    """Lightning-fast single Android attempt for cloud serverless."""
+    socket_timeout = extra.pop("socket_timeout", 5)
     shared = _ytdlp_base_opts(
         socket_timeout=socket_timeout,
-        retries=retries,
-        fragment_retries=fragment_retries,
+        retries=0,
+        fragment_retries=0,
         writesubtitles=True,
         writeautomaticsub=True,
         **extra,
@@ -728,24 +700,9 @@ def _ytdlp_attempts(**extra) -> list[dict]:
     return [
         {
             **shared,
-            "format": extra.get(
-                "format",
-                "140/139/249/251/ba/b/bestaudio/best/worstaudio/worst",
-            ),
+            "format": "ba/b/best",
             "extractor_args": {"youtube": {"player_client": ["android"]}},
-        },
-        {
-            **shared,
-            "format": extra.get(
-                "format",
-                "bestaudio/best/worstaudio/worst/ba/b",
-            ),
-            "extractor_args": {"youtube": {"player_client": ["tv"]}},
-        },
-        {
-            **shared,
-            "extractor_args": {"youtube": {"player_client": ["mweb"]}},
-        },
+        }
     ]
 
 

@@ -88,17 +88,16 @@ function updateFileLabel(name) {
 }
 
 /* ─── API URL resolution ─── */
-const PRIMARY_TUNNEL = "https://future-simon-clean-sunday.trycloudflare.com";
-const FALLBACK_VERCEL = "https://ai-video-summarizer-zv8y.vercel.app";
+const CLOUD_BACKEND = "https://ai-video-summarizer-zv8y.vercel.app";
 
 function getApiUrl(endpoint) {
-  // If opened directly on localhost or Cloudflare tunnel, use relative path
+  // If opened directly on Vercel or localhost, use relative path
   if (!window.location.hostname.endsWith("github.io")) {
     return endpoint;
   }
   const custom = localStorage.getItem("ai_backend_url");
   if (custom) return custom.replace(/\/+$/, "") + endpoint;
-  return PRIMARY_TUNNEL + endpoint;
+  return CLOUD_BACKEND + endpoint;
 }
 
 /* ─── Engine health ─── */

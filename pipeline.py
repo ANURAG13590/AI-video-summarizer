@@ -149,10 +149,27 @@ def _fetch_via_proxies(video_id: str) -> tuple[str, list[dict]]:
     return "", []
 
 
+def _create_fast_session():
+    import requests
+
+    class FastSession(requests.Session):
+        def request(self, *args, **kwargs):
+            kwargs.setdefault("timeout", 4)
+            headers = kwargs.get("headers") or {}
+            if "User-Agent" not in headers:
+                headers["User-Agent"] = (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+                )
+                kwargs["headers"] = headers
+            return super().request(*args, **kwargs)
+
+    return FastSession()
+
+
 def fetch_youtube_transcript(video_id: str) -> tuple[str, list[dict]]:
     from youtube_transcript_api import YouTubeTranscriptApi
 
-    api = YouTubeTranscriptApi()
+    api = YouTubeTranscriptApi(http_client=_create_fast_session())
     errors: list[str] = []
 
     # 1. Try listing tracks: prefer English, or auto-translate non-English (like Hindi) to English
@@ -697,9 +714,9 @@ def _ytdlp_base_opts(**extra) -> dict:
 
 def _ytdlp_attempts(**extra) -> list[dict]:
     """Android client first to bypass datacenter/cloud IP blocks, then mweb/tv."""
-    socket_timeout = extra.pop("socket_timeout", 30)
-    retries = extra.pop("retries", 3)
-    fragment_retries = extra.pop("fragment_retries", 3)
+    socket_timeout = extra.pop("socket_timeout", 8)
+    retries = extra.pop("retries", 1)
+    fragment_retries = extra.pop("fragment_retries", 1)
     shared = _ytdlp_base_opts(
         socket_timeout=socket_timeout,
         retries=retries,

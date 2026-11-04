@@ -7,7 +7,7 @@ import tempfile
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -25,13 +25,22 @@ try:
 except Exception:
     UPLOAD_DIR = Path(tempfile.gettempdir())
 
-app = FastAPI(title="AI Video Summarizer", version="1.0.0")
+app = FastAPI(title="AI Video Summarizer", version="1.0.0", root_path="")
+
 
 @app.middleware("http")
-async def debug_path_middleware(request, call_next):
+async def normalize_path(request: Request, call_next):
+    # Ensure root_path is empty so FastAPI matches full paths cleanly
+    request.scope["root_path"] = ""
+    path = request.scope.get("path", "")
+    for prefix in ["/api/index.py", "/api/index"]:
+        if path.startswith(prefix):
+            path = path[len(prefix):] or "/"
+            request.scope["path"] = path
+            break
     response = await call_next(request)
-    response.headers["X-Debug-Path"] = request.url.path
     return response
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -51,21 +60,9 @@ class UrlRequest(BaseModel):
     style: str = Field(default="brief")
 
 
-
-@app.get("/api/debug")
-@app.get("/debug")
-def debug_info(request: Request):
-    return {
-        "url_path": request.url.path,
-        "scope_path": request.scope.get("path"),
-        "raw_path": request.scope.get("raw_path", b"").decode("latin-1"),
-        "headers": dict(request.headers),
-    }
-
 @app.get("/")
-def index(request: Request):
-    if "api" in request.url.path or "application/json" in request.headers.get("accept", ""):
-        return {"status": "AI Video Summarizer API ready", "ok": True}
+@app.get("/api")
+def index():
     index_file = STATIC / "index.html"
     if not index_file.exists():
         index_file = ROOT / "index.html"

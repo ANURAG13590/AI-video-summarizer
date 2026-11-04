@@ -755,19 +755,7 @@ def summarize_youtube(url: str, style: str) -> dict:
                 transcript, timed = transcribe_audio_file(audio)
             source = "whisper"
         except Exception as whisper_error:
-            message = str(whisper_error)
-            if "blocked" in message.lower() or "bot" in message.lower():
-                hint = (
-                    "YouTube blocked the download from this network. "
-                    "Try again later, or add YTDLP_COOKIES_BROWSER=edge to your .env file."
-                )
-            elif "25 MB" in message or "too large" in message.lower():
-                hint = message
-            else:
-                hint = (
-                    "This video has no captions, and audio transcription failed. "
-                    "Try a shorter video, or one with subtitles enabled."
-                )
+            hint = f"Captions: {' | '.join(errors)} | Audio/Whisper: {whisper_error}"
             raise RuntimeError(hint) from whisper_error
 
     if not transcript:

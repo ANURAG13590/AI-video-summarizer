@@ -614,10 +614,13 @@ def _ytdlp_base_opts(**extra) -> dict:
 
 def _ytdlp_attempts(**extra) -> list[dict]:
     """Try smaller web formats first, then android fallback for bot-blocked IPs."""
+    socket_timeout = extra.pop("socket_timeout", 120)
+    retries = extra.pop("retries", 10)
+    fragment_retries = extra.pop("fragment_retries", 10)
     shared = _ytdlp_base_opts(
-        socket_timeout=120,
-        retries=10,
-        fragment_retries=10,
+        socket_timeout=socket_timeout,
+        retries=retries,
+        fragment_retries=fragment_retries,
         **extra,
     )
     return [

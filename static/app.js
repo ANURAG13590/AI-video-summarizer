@@ -229,12 +229,15 @@ function formatDetail(detail) {
 
 function friendlyError(err) {
   const msg = err && err.message ? err.message : String(err);
+  if (window.location.hostname.endsWith("github.io") && !localStorage.getItem("ai_backend_url")) {
+    return "GitHub Pages only hosts static design files and cannot run the Python video processor. To summarize videos, run 'start.bat' on your machine (or open your Cloudflare link), or click 'Connect backend URL' above.";
+  }
   if (
     msg === "Failed to fetch" ||
     msg === "Load failed" ||
     msg.includes("NetworkError")
   ) {
-    return "Connection failed. The app server is not running. In this folder run: uvicorn app:app --host 127.0.0.1 --port 8000 then open http://127.0.0.1:8000";
+    return "Connection failed. The app server is not running. In this folder run 'start.bat' (or: uvicorn app:app --host 127.0.0.1 --port 8000), then refresh.";
   }
   if (/403|access denied|network settings/i.test(msg)) {
     return "Groq/OpenAI blocked this request (403). Check your API key in .env, or try another network/VPN.";
@@ -270,13 +273,22 @@ function looksLikeYouTubeUrl(value) {
 
 /* ─── API call ─── */
 async function postJson(url, body) {
-  const res  = await fetch(getApiUrl(url), {
+  const target = getApiUrl(url);
+  const res  = await fetch(target, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+  if (!res.ok) {
+    if (res.status === 404 || res.status === 405) {
+      if (window.location.hostname.endsWith("github.io") && !localStorage.getItem("ai_backend_url")) {
+        throw new Error("GitHub Pages cannot run the Python video processor. Please open the app locally via start.bat (or your Cloudflare tunnel).");
+      }
+    }
+    const data = await res.json().catch(() => ({}));
+    throw new Error(formatDetail(data.detail) || `Request failed (${res.status})`);
+  }
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(formatDetail(data.detail) || "Request failed");
   return data;
 }
 
@@ -315,8 +327,16 @@ fileForm.addEventListener("submit", async (event) => {
     form.append("file", file);
     form.append("style", style);
     const res  = await fetch(getApiUrl("/api/summarize-file"), { method: "POST", body: form });
+    if (!res.ok) {
+      if (res.status === 404 || res.status === 405) {
+        if (window.location.hostname.endsWith("github.io") && !localStorage.getItem("ai_backend_url")) {
+          throw new Error("GitHub Pages cannot run the Python video processor. Please open the app locally via start.bat (or your Cloudflare tunnel).");
+        }
+      }
+      const data = await res.json().catch(() => ({}));
+      throw new Error(formatDetail(data.detail) || `Upload failed (${res.status})`);
+    }
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(formatDetail(data.detail) || "Upload failed");
     render(data);
   } catch (err) {
     showError(friendlyError(err));

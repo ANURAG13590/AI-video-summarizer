@@ -18,9 +18,7 @@ from pipeline import AUDIO_EXTS, VIDEO_EXTS, normalize_youtube_input, summarize_
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
-# Ensure GROQ_API_KEY fallback
-if not os.getenv("GROQ_API_KEY"):
-    os.environ["GROQ_API_KEY"] = "BSHKzkP6xuh33m89GnYrITDpYF3bydGWNMH8UnLuAcQGZ3eQ3hD8_ksg"[::-1]
+# API keys are set via env vars or api/index.py fallbacks
 
 STATIC = ROOT / "static"
 UPLOAD_DIR = Path(tempfile.gettempdir()) / "ai_summarizer_uploads"
@@ -74,10 +72,19 @@ def index():
 def health():
     groq = bool(os.getenv("GROQ_API_KEY", "").strip())
     openai = bool(os.getenv("OPENAI_API_KEY", "").strip())
+    hf = bool(os.getenv("HF_TOKEN", "").strip())
+    if groq:
+        llm = "groq"
+    elif openai:
+        llm = "openai"
+    elif hf:
+        llm = "huggingface"
+    else:
+        llm = "extractive"
     return {
         "ok": True,
-        "llm": "groq" if groq else ("openai" if openai else "extractive"),
-        "whisper": groq or openai,
+        "llm": llm,
+        "whisper": groq or openai or hf,
     }
 
 

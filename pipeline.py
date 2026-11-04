@@ -120,6 +120,48 @@ def _snippets_to_text(snippets) -> tuple[str, list[dict]]:
 PREFERRED_LANGS = ["en", "en-US", "en-GB", "en-IN"]
 
 
+def _fetch_via_proxies(video_id: str) -> tuple[str, list[dict]]:
+    """Try fetching YouTube transcript via free rotating proxies."""
+    from youtube_transcript_api import YouTubeTranscriptApi
+    from youtube_transcript_api.proxies import GenericProxyConfig
+    import random
+
+    proxy_sources = [
+        "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=3000&country=all&ssl=yes&anonymity=all",
+        "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt",
+    ]
+    proxies: list[str] = []
+    for src in proxy_sources:
+        try:
+            resp = httpx.get(src, timeout=5)
+            if resp.status_code == 200:
+                new_proxies = [p.strip() for p in resp.text.splitlines() if p.strip() and ":" in p]
+                proxies.extend(new_proxies)
+        except Exception:
+            continue
+        if len(proxies) >= 20:
+            break
+
+    random.shuffle(proxies)
+    for proxy in proxies[:20]:
+        try:
+            proxy_url = f"http://{proxy}" if not proxy.startswith("http") else proxy
+            api = YouTubeTranscriptApi(
+                proxy_config=GenericProxyConfig(
+                    http_url=proxy_url,
+                    https_url=proxy_url,
+                )
+            )
+            fetched = api.fetch(video_id, languages=["en", "en-US", "en-GB", "en-IN"])
+            text, timed = _snippets_to_text(fetched)
+            if text:
+                return text, timed
+        except Exception:
+            continue
+
+    return "", []
+
+
 def fetch_youtube_transcript(video_id: str) -> tuple[str, list[dict]]:
     from youtube_transcript_api import YouTubeTranscriptApi
 
@@ -172,6 +214,14 @@ def fetch_youtube_transcript(video_id: str) -> tuple[str, list[dict]]:
             return text, timed
     except Exception as exc:
         errors.append(f"any_fetch: {exc}")
+
+    # 4. Try with free rotating proxies (for cloud/datacenter IP blocks)
+    try:
+        proxy_text, proxy_timed = _fetch_via_proxies(video_id)
+        if proxy_text:
+            return proxy_text, proxy_timed
+    except Exception as exc:
+        errors.append(f"proxy: {exc}")
 
     message = "; ".join(errors) if errors else "Could not fetch YouTube captions."
     if any("blocked" in err.lower() for err in errors):
@@ -262,11 +312,47 @@ def _extractive_summary(text: str, max_sentences: int = 8) -> str:
 def _llm_available() -> tuple[str | None, str | None]:
     groq_key = os.getenv("GROQ_API_KEY", "").strip()
     openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+    hf_key = os.getenv("HF_TOKEN", "").strip()
     if groq_key:
         return "groq", groq_key
     if openai_key:
         return "openai", openai_key
+    if hf_key:
+        return "huggingface", hf_key
     return None, None
+
+
+def _chat_hf(system: str, user: str, hf_key: str) -> str:
+    """Call HuggingFace Inference API (free tier) using open models."""
+    models_to_try = [
+        "meta-llama/Meta-Llama-3.1-8B-Instruct",
+        "mistralai/Mistral-7B-Instruct-v0.3",
+        "HuggingFaceH4/zephyr-7b-beta",
+    ]
+    for model_id in models_to_try:
+        try:
+            resp = httpx.post(
+                f"https://api-inference.huggingface.co/models/{model_id}/v1/chat/completions",
+                headers={"Authorization": f"Bearer {hf_key}"},
+                json={
+                    "model": model_id,
+                    "messages": [
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user},
+                    ],
+                    "max_tokens": 1800,
+                    "temperature": 0.3,
+                },
+                timeout=90,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                if content:
+                    return content.strip()
+        except Exception:
+            continue
+    raise RuntimeError("HuggingFace inference failed on all models.")
 
 
 def _chat(system: str, user: str) -> str:
@@ -289,6 +375,9 @@ def _chat(system: str, user: str) -> str:
             ],
         )
         return (resp.choices[0].message.content or "").strip()
+
+    if provider == "huggingface":
+        return _chat_hf(system, user, key)
 
     from openai import OpenAI
 

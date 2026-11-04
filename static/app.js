@@ -87,10 +87,17 @@ function updateFileLabel(name) {
   if (lbl) lbl.textContent = name;
 }
 
+/* ─── API URL resolution ─── */
+function getApiUrl(endpoint) {
+  const custom = localStorage.getItem("ai_backend_url");
+  if (custom) return custom.replace(/\/+$/, "") + endpoint;
+  return endpoint;
+}
+
 /* ─── Engine health ─── */
 async function loadHealth() {
   try {
-    const res  = await fetch("/api/health");
+    const res  = await fetch(getApiUrl("/api/health"));
     const data = await res.json();
     const whisper = data.whisper
       ? "Whisper ready"
@@ -99,9 +106,25 @@ async function loadHealth() {
     const navBadge = document.getElementById("navStatusBadge");
     if (navBadge) navBadge.textContent = `${data.llm} Active`;
   } catch {
-    engineStatus.textContent = "Engine: offline — start the server, then refresh";
+    engineStatus.innerHTML = `Engine: offline — <a href="javascript:void(0)" id="setBackendLink" style="color:var(--apple-cyan);text-decoration:underline;cursor:pointer;">Connect backend URL</a>`;
     const navBadge = document.getElementById("navStatusBadge");
     if (navBadge) navBadge.textContent = "Engine Offline";
+    const link = document.getElementById("setBackendLink");
+    if (link) {
+      link.onclick = (e) => {
+        e.preventDefault();
+        const current = localStorage.getItem("ai_backend_url") || "";
+        const entered = prompt("Enter your live backend URL (e.g. Cloudflare tunnel or public URL, leave blank for local):", current);
+        if (entered !== null) {
+          if (entered.trim()) {
+            localStorage.setItem("ai_backend_url", entered.trim());
+          } else {
+            localStorage.removeItem("ai_backend_url");
+          }
+          loadHealth();
+        }
+      };
+    }
   }
 }
 loadHealth();
@@ -247,7 +270,7 @@ function looksLikeYouTubeUrl(value) {
 
 /* ─── API call ─── */
 async function postJson(url, body) {
-  const res  = await fetch(url, {
+  const res  = await fetch(getApiUrl(url), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -291,7 +314,7 @@ fileForm.addEventListener("submit", async (event) => {
     const form  = new FormData();
     form.append("file", file);
     form.append("style", style);
-    const res  = await fetch("/api/summarize-file", { method: "POST", body: form });
+    const res  = await fetch(getApiUrl("/api/summarize-file"), { method: "POST", body: form });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(formatDetail(data.detail) || "Upload failed");
     render(data);

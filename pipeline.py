@@ -596,7 +596,8 @@ def _ytdlp_base_opts(**extra) -> dict:
         "quiet": True,
         "no_warnings": True,
         "noprogress": True,
-        "ignoreerrors": True,
+        "ignoreerrors": False,
+        "cachedir": False,
         **extra,
     }
     cookies_file = os.getenv("YTDLP_COOKIES_FILE", "").strip()

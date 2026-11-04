@@ -1,23 +1,22 @@
 /* ─────────────────────────────────────────────────────────────
-   APPLE MACBOOK PRO DESIGN SYSTEM (EXACT TO REFERENCE SCREENSHOT)
-   Pure Deep Black #000, Apple Navigation, Precision Pro Lighting
+   APPLE OFFICIAL MACBOOK PRO HOMEPAGE STYLING
+   Deep OLED Black (#000), Apple Typography, Exact Layout
    ───────────────────────────────────────────────────────────── */
 
 :root {
-  --apple-black: #000000;
-  --apple-nav-bg: rgba(22, 22, 23, 0.85);
-  --apple-ribbon-bg: #1d1d1f;
+  --apple-bg: #000000;
+  --apple-nav: rgba(22, 22, 23, 0.88);
+  --apple-ribbon: #1d1d1f;
   --apple-text: #f5f5f7;
-  --apple-subtext: #86868b;
+  --apple-sub: #86868b;
   --apple-blue: #0071e3;
   --apple-blue-hover: #0077ed;
-  --apple-gold: #d4a373;
   --apple-cyan: #2997ff;
+  --apple-gold: #f5b041;
+  --apple-card: #161617;
   --apple-border: rgba(255, 255, 255, 0.12);
-  --apple-surface: rgba(255, 255, 255, 0.04);
-  --apple-surface-card: #161617;
-  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
-  --font-mono: "SF Mono", Menlo, Monaco, Consolas, monospace;
+  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", Menlo, Consolas, Monaco, monospace;
 }
 
 *, *::before, *::after {
@@ -27,17 +26,15 @@
 }
 
 html {
+  background: var(--apple-bg);
+  color: var(--apple-text);
+  font-family: var(--font-apple);
+  -webkit-font-smoothing: antialiased;
   scroll-behavior: smooth;
-  background-color: var(--apple-black);
 }
 
 body {
-  font-family: var(--font-apple);
-  background-color: var(--apple-black);
-  color: var(--apple-text);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--apple-bg);
   overflow-x: hidden;
 }
 
@@ -47,10 +44,10 @@ a {
 }
 
 button {
-  font-family: inherit;
-  cursor: pointer;
+  font: inherit;
   border: none;
   background: none;
+  cursor: pointer;
 }
 
 .hidden {
@@ -58,110 +55,85 @@ button {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   1. APPLE GLOBAL NAVIGATION
+   1. APPLE GLOBAL NAVIGATION (EXACT TO REFERENCE)
 ═══════════════════════════════════════════════════════════════ */
 .apple-nav {
   position: sticky;
   top: 0;
-  z-index: 1000;
-  background-color: var(--apple-nav-bg);
+  z-index: 9999;
+  height: 44px;
+  background: var(--apple-nav);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  height: 44px;
 }
 
 .apple-nav-inner {
   max-width: 1024px;
   height: 100%;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.nav-apple-logo {
+.nav-icon {
   display: flex;
   align-items: center;
-  color: var(--apple-text);
-  opacity: 0.88;
+  color: #d6d6d6;
+  opacity: 0.8;
   transition: opacity 0.2s;
 }
 
-.nav-apple-logo:hover {
+.nav-icon:hover {
   opacity: 1;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 34px;
 }
 
 .nav-links a {
   font-size: 12px;
   font-weight: 400;
   letter-spacing: -0.01em;
-  color: var(--apple-text);
+  color: #d6d6d6;
   opacity: 0.8;
   transition: opacity 0.2s;
 }
 
-.nav-links a:hover, .nav-links a.active {
+.nav-links a:hover,
+.nav-links a.active {
   opacity: 1;
+  color: #ffffff;
 }
 
-.nav-icons {
+.nav-actions {
   display: flex;
   align-items: center;
   gap: 24px;
 }
 
-.nav-icons a {
-  color: var(--apple-text);
-  opacity: 0.8;
-  display: flex;
-  align-items: center;
-  transition: opacity 0.2s;
-}
-
-.nav-icons a:hover {
-  opacity: 1;
-}
-
-.nav-hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 4px;
-  padding: 6px;
-}
-
-.nav-hamburger span {
-  display: block;
-  width: 18px;
-  height: 1.5px;
-  background: var(--apple-text);
-  border-radius: 1px;
-}
-
 /* ═══════════════════════════════════════════════════════════════
-   2. APPLE RIBBON BANNER
+   2. APPLE PROMO TOP BANNER
 ═══════════════════════════════════════════════════════════════ */
 .apple-ribbon {
-  background-color: var(--apple-ribbon-bg);
+  background: var(--apple-ribbon);
   color: #a1a1a6;
   text-align: center;
   font-size: 14px;
   padding: 12px 16px;
   line-height: 1.4;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .apple-ribbon a {
   color: var(--apple-cyan);
-  display: inline-block;
   margin-left: 4px;
+  display: inline-block;
 }
 
 .apple-ribbon a:hover {
@@ -169,22 +141,22 @@ button {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   3. MACBOOK PRO HERO (MATCHING USER SCREENSHOT)
+   3. HERO SECTION (100% MATCHING USER SCREENSHOT)
 ═══════════════════════════════════════════════════════════════ */
 .apple-hero {
-  background: radial-gradient(circle at 50% 30%, #151516 0%, #000000 70%);
-  padding: 64px 20px 40px;
+  background: #000000;
   text-align: center;
+  padding-top: 54px;
   position: relative;
   overflow: hidden;
 }
 
-.apple-hero-header {
+.hero-content {
   max-width: 800px;
-  margin: 0 auto 36px;
+  margin: 0 auto;
 }
 
-.mac-title {
+.hero-title {
   font-size: clamp(48px, 6.5vw, 68px);
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -193,293 +165,134 @@ button {
   margin-bottom: 6px;
 }
 
-.mac-subtitle {
+.hero-subtitle {
   font-size: clamp(24px, 3.2vw, 32px);
   font-weight: 600;
   letter-spacing: -0.015em;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .pro-gold {
-  color: #e5a93c;
+  color: var(--apple-gold);
   font-weight: 700;
 }
 
 .xdr-blue {
-  color: #2997ff;
+  color: var(--apple-cyan);
   font-weight: 600;
 }
 
-.mac-date {
+.hero-date {
   font-size: 19px;
-  color: #a1a1a6;
+  color: #86868b;
   font-weight: 400;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
-.mac-cta-group {
+.hero-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
+  margin-bottom: 36px;
 }
 
-.btn-apple-pill {
+.btn-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 22px;
+  padding: 9px 21px;
   border-radius: 980px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
   letter-spacing: -0.01em;
   transition: all 0.2s ease;
 }
 
-.btn-apple-blue {
-  background-color: var(--apple-blue);
+.btn-blue {
+  background: var(--apple-blue);
   color: #ffffff;
 }
 
-.btn-apple-blue:hover {
-  background-color: var(--apple-blue-hover);
+.btn-blue:hover {
+  background: var(--apple-blue-hover);
 }
 
-.btn-apple-outline {
-  background-color: transparent;
-  color: #2997ff;
-  border: 1px solid #2997ff;
+.btn-outline {
+  background: transparent;
+  color: var(--apple-cyan);
+  border: 1px solid var(--apple-cyan);
 }
 
-.btn-apple-outline:hover {
-  background-color: rgba(41, 151, 255, 0.1);
+.btn-outline:hover {
+  background: rgba(41, 151, 255, 0.1);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   4. DETAILED REALISTIC CSS MACBOOK PRO DISPLAY & BASE
-═══════════════════════════════════════════════════════════════ */
-.macbook-device-wrapper {
-  max-width: 980px;
-  margin: 0 auto;
-  perspective: 1200px;
-  padding: 0 10px;
-}
-
-.macbook-device {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Screen Lid */
-.macbook-screen {
+/* EXACT MACBOOK IMAGE CONTAINER */
+.hero-image-wrap {
   width: 100%;
-  max-width: 820px;
-  aspect-ratio: 16 / 10;
-  background: #0d0d0e;
-  border-radius: 20px 20px 4px 4px;
-  padding: 10px 10px 14px;
-  border: 1px solid #2c2c2e;
-  box-shadow: 0 0 1px 1px #3a3a3c, 0 30px 90px rgba(0, 0, 0, 0.9);
+  max-width: 1100px;
+  margin: 0 auto -40px;
   position: relative;
-}
-
-.macbook-bezel {
-  width: 100%;
-  height: 100%;
-  background: #000000;
-  border-radius: 12px 12px 2px 2px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #1c1c1e;
-}
-
-.macbook-notch {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 140px;
-  height: 18px;
-  background: #000000;
-  border-radius: 0 0 8px 8px;
-  z-index: 20;
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
-.notch-camera {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #0c1a24;
-  border: 1px solid #1d2c38;
-}
-
-.macbook-display-content {
+.macbook-hero-img {
   width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: #000;
-}
-
-/* Exact Wallpaper Light-Wave Pillars form the word "PRO" */
-.pro-wall-art {
-  width: 100%;
-  height: 100%;
-  background: #000000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  background-image: 
-    repeating-linear-gradient(90deg, 
-      rgba(255,255,255,0.02) 0px, 
-      rgba(255,255,255,0.02) 2px, 
-      transparent 2px, 
-      transparent 6px);
-}
-
-/* Light Columns creating the exact striped organic display in screenshot */
-.pro-wall-art::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(ellipse 55% 85% at 50% 45%, rgba(255,255,255,0.92) 0%, rgba(200,215,240,0.7) 30%, rgba(220,160,80,0.3) 65%, transparent 85%);
-  filter: contrast(160%) brightness(120%);
-  mask-image: radial-gradient(ellipse at 50% 50%, black 60%, transparent 95%);
-}
-
-.display-reflection {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+  height: auto;
+  display: block;
+  object-fit: contain;
   pointer-events: none;
-}
-
-/* MacBook Unibody Base & Keyboard */
-.macbook-base {
-  width: 100%;
-  max-width: 940px;
-  height: 160px;
-  background: linear-gradient(180deg, #242426 0%, #161618 100%);
-  border-radius: 4px 4px 28px 28px;
-  border: 1px solid #3a3a3c;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95);
-  position: relative;
-  margin-top: -4px;
-  padding: 12px 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.macbook-keyboard-deck {
-  width: 100%;
-  max-width: 820px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.macbook-speaker {
-  width: 50px;
-  height: 120px;
-  background-image: radial-gradient(#111 20%, transparent 20%);
-  background-size: 3px 3px;
-  opacity: 0.6;
-}
-
-.macbook-keyboard {
-  flex: 1;
-  background: #09090a;
-  border-radius: 8px;
-  padding: 8px;
-  border: 1px solid #1a1a1c;
-}
-
-.kb-row {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.kb-row span {
-  flex: 1;
-  height: 22px;
-  background: #171719;
-  border-radius: 3px;
-  border-bottom: 1.5px solid #000;
-  color: #777;
-  font-size: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-apple);
-}
-
-.kb-row .touch-id {
-  background: #0f0f10;
-  border: 1px solid #333;
-}
-
-.macbook-notch-lip {
-  width: 90px;
-  height: 6px;
-  background: #121213;
-  border-radius: 0 0 6px 6px;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  filter: contrast(105%) brightness(102%);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   5. SUMMARIZER CONSOLE (DARK TITANIUM SLATE)
+   4. SUMMARIZER CONSOLE (DARK TITANIUM SLATE)
 ═══════════════════════════════════════════════════════════════ */
 .app-section {
-  padding: 80px 20px;
-  max-width: 960px;
+  padding: 90px 20px 80px;
+  background: linear-gradient(180deg, #000000 0%, #0d0d0e 50%, #000000 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 10;
+}
+
+.section-inner {
+  max-width: 880px;
   margin: 0 auto;
 }
 
-.headline-container {
+.section-header {
   text-align: center;
   margin-bottom: 36px;
 }
 
 .section-eyebrow {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--apple-cyan);
   margin-bottom: 8px;
 }
 
-.section-title {
-  font-size: clamp(32px, 4vw, 44px);
+.section-headline {
+  font-size: clamp(30px, 4vw, 42px);
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-.section-sub {
-  font-size: 15px;
-  color: var(--apple-subtext);
+.section-status {
+  font-size: 14px;
+  color: var(--apple-sub);
 }
 
 .panel {
-  background: var(--apple-surface-card);
+  background: var(--apple-card);
   border: 1px solid var(--apple-border);
-  border-radius: 22px;
+  border-radius: 20px;
   padding: 32px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
 }
@@ -487,7 +300,7 @@ button {
 .tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   background: rgba(255, 255, 255, 0.04);
   padding: 4px;
   border-radius: 12px;
@@ -557,7 +370,6 @@ input[type="text"]:focus {
   box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.25);
 }
 
-/* File Drop Zone */
 .drop {
   display: block;
   border: 1.5px dashed #3a3a3c;
@@ -569,7 +381,8 @@ input[type="text"]:focus {
   transition: all 0.2s ease;
 }
 
-.drop:hover, .drop.dragover {
+.drop:hover,
+.drop.dragover {
   border-color: var(--apple-blue);
   background: rgba(0, 113, 227, 0.05);
 }
@@ -604,7 +417,6 @@ input[type="text"]:focus {
   color: #86868b;
 }
 
-/* Style Selector and Submit Row */
 .row {
   display: flex;
   align-items: flex-end;
@@ -653,7 +465,7 @@ legend {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 11px 22px;
   border-radius: 980px;
   font-size: 14px;
   font-weight: 500;
@@ -683,9 +495,7 @@ legend {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   6. PROGRESS AND STATUS
-═══════════════════════════════════════════════════════════════ */
+/* Progress & alerts */
 .progress-wrap {
   margin-top: 28px;
 }
@@ -726,12 +536,10 @@ legend {
   color: #ff453a;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   7. RESULTS SECTION
-═══════════════════════════════════════════════════════════════ */
+/* Results block */
 .result {
   margin-top: 36px;
-  background: var(--apple-surface-card);
+  background: var(--apple-card);
   border: 1px solid var(--apple-border);
   border-radius: 20px;
   overflow: hidden;
@@ -797,7 +605,8 @@ legend {
   line-height: 1.6;
 }
 
-.result-body ul, .result-body ol {
+.result-body ul,
+.result-body ol {
   padding-left: 20px;
   display: flex;
   flex-direction: column;
@@ -827,130 +636,18 @@ pre {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   8. BENTO FEATURES GRID
-═══════════════════════════════════════════════════════════════ */
-.features, .how {
-  padding: 80px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.section-inner {
-  max-width: 1024px;
-  margin: 0 auto;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 40px;
-}
-
-.feature-card {
-  background: var(--apple-surface-card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 28px;
-  transition: transform 0.2s, border-color 0.2s;
-}
-
-.feature-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-.feature-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: rgba(41, 151, 255, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.feature-icon svg {
-  width: 20px;
-  height: 20px;
-  color: var(--apple-cyan);
-}
-
-.feature-card h3 {
-  font-size: 17px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.feature-card p {
-  font-size: 14px;
-  color: #86868b;
-  line-height: 1.5;
-}
-
-/* Steps */
-.steps {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 40px;
-}
-
-.step {
-  flex: 1;
-  background: var(--apple-surface-card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 28px;
-}
-
-.step-num {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--apple-cyan);
-  margin-bottom: 8px;
-}
-
-.step-body h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.step-body p {
-  font-size: 14px;
-  color: #86868b;
-}
-
-.step-arrow {
-  color: #555;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   9. FOOTER
+   5. FOOTER
 ═══════════════════════════════════════════════════════════════ */
 .footer {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 40px 20px;
-  background: #000;
+  padding: 30px 20px;
+  background: #000000;
+  text-align: center;
 }
 
 .footer-inner {
   max-width: 1024px;
   margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #86868b;
 }
 
 .footer-note {
@@ -958,26 +655,13 @@ pre {
   color: #6e6e73;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE DESIGN
-═══════════════════════════════════════════════════════════════ */
-@media (max-width: 860px) {
+/* Mobile responsive */
+@media (max-width: 820px) {
   .nav-links {
     display: none;
   }
-  .nav-hamburger {
-    display: flex;
-  }
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-  .steps {
+  .hero-buttons {
     flex-direction: column;
-  }
-  .step-arrow {
-    transform: rotate(90deg);
-  }
-  .macbook-screen {
-    max-width: 95%;
+    gap: 12px;
   }
 }

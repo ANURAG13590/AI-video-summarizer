@@ -88,17 +88,17 @@ function updateFileLabel(name) {
 }
 
 /* ─── API URL resolution ─── */
+const PRIMARY_TUNNEL = "https://stickers-nelson-find-modems.trycloudflare.com";
+const FALLBACK_VERCEL = "https://ai-video-summarizer-zv8y.vercel.app";
+
 function getApiUrl(endpoint) {
-  // If opened directly on the server or Cloudflare tunnel, ALWAYS use relative path
+  // If opened directly on localhost or Cloudflare tunnel, use relative path
   if (!window.location.hostname.endsWith("github.io")) {
     return endpoint;
   }
   const custom = localStorage.getItem("ai_backend_url");
-  if (custom && !custom.includes("trycloudflare.com")) return custom.replace(/\/+$/, "") + endpoint;
-  if (custom && custom.includes("trycloudflare.com")) {
-    localStorage.removeItem("ai_backend_url");
-  }
-  return "https://ai-video-summarizer-zv8y.vercel.app" + endpoint;
+  if (custom) return custom.replace(/\/+$/, "") + endpoint;
+  return PRIMARY_TUNNEL + endpoint;
 }
 
 /* ─── Engine health ─── */

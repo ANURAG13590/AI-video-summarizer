@@ -436,13 +436,7 @@
       </div>
     </footer>
 
-    <script>
-      // Automatically connect to active live AI engine
-      if (!localStorage.getItem("ai_backend_url") || localStorage.getItem("ai_backend_url").includes("mounts-contributor")) {
-        localStorage.setItem("ai_backend_url", "https://streaming-crimes-cadillac-casey.trycloudflare.com");
-      }
-    </script>
-    <script src="static/app.js?t=v4_immediate_connect"></script>
+    <script src="/static/app.js?t=v5_clean"></script>
     <script>
       // Quick shortcut helper for Upload button in nav
       const uploadNav = document.getElementById("navUploadLink");

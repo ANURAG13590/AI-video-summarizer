@@ -89,6 +89,7 @@ function updateFileLabel(name) {
 
 /* ─── 24/7 Cloud API URL Resolution ─── */
 const CLOUD_BACKENDS = [
+  "https://crop-physiology-wheel-fool.trycloudflare.com",
   "https://ai-video-summarizer-qx.vercel.app",
   "https://ai-video-summarizer-zv8y.vercel.app"
 ];

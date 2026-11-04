@@ -834,10 +834,8 @@ def summarize_youtube(url: str, style: str) -> dict:
     if not transcript:
         provider, _ = _llm_available()
         if not provider:
-            raise RuntimeError(
-                "Could not fetch captions for this video. YouTube may be rate-limiting cloud IPs for this specific video. "
-                "Try another video or upload the audio/video file directly."
-            )
+            detail_err = " | ".join(errors) if errors else "No captions found"
+            raise RuntimeError(f"Could not fetch captions ({detail_err}). Try another video or upload the audio/video file directly.")
         try:
             with tempfile.TemporaryDirectory() as tmp:
                 tmp_path = Path(tmp)

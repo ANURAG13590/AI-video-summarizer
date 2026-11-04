@@ -7,11 +7,11 @@
   },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "source": "/static/(.*)",
+      "destination": "/static/$1"
     },
     {
-      "source": "/api",
+      "source": "/(.*)",
       "destination": "/api/index.py"
     }
   ]

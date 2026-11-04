@@ -87,10 +87,15 @@ function updateFileLabel(name) {
   if (lbl) lbl.textContent = name;
 }
 
+const DEFAULT_BACKEND_URL = "https://streaming-crimes-cadillac-casey.trycloudflare.com";
+
 /* ─── API URL resolution ─── */
 function getApiUrl(endpoint) {
   const custom = localStorage.getItem("ai_backend_url");
   if (custom) return custom.replace(/\/+$/, "") + endpoint;
+  if (window.location.hostname.endsWith("github.io")) {
+    return DEFAULT_BACKEND_URL.replace(/\/+$/, "") + endpoint;
+  }
   return endpoint;
 }
 

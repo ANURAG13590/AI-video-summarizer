@@ -18,11 +18,6 @@ from pipeline import AUDIO_EXTS, VIDEO_EXTS, normalize_youtube_input, summarize_
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
-# HuggingFace token fallback for LLM inference (free tier)
-if not os.getenv("HF_TOKEN"):
-    # Reversed to avoid GitHub secret scanning
-    os.environ["HF_TOKEN"] = "MaFbRPNkSgNAyHVTiBOMpiVDmkzwRRixUR_fh"[::-1]
-
 STATIC = ROOT / "static"
 UPLOAD_DIR = Path(tempfile.gettempdir()) / "ai_summarizer_uploads"
 try:
@@ -73,21 +68,21 @@ def index():
 @app.get("/api/health")
 @app.get("/health")
 def health():
-    groq = bool(os.getenv("GROQ_API_KEY", "").strip())
+    groq = bool(os.getenv("GROQ_API_KEY", "").strip()) and os.getenv("GROQ_API_KEY") != "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"
+    gemini = bool(os.getenv("GEMINI_API_KEY", "").strip())
     openai = bool(os.getenv("OPENAI_API_KEY", "").strip())
-    hf = bool(os.getenv("HF_TOKEN", "").strip())
     if groq:
         llm = "groq"
+    elif gemini:
+        llm = "gemini"
     elif openai:
         llm = "openai"
-    elif hf:
-        llm = "huggingface"
     else:
-        llm = "extractive"
+        llm = "instant-clarity"
     return {
         "ok": True,
         "llm": llm,
-        "whisper": groq or openai or hf,
+        "whisper": bool(groq or gemini or openai),
     }
 
 
@@ -111,31 +106,31 @@ async def api_summarize_file(
 ):
     if style not in {"brief", "detailed", "bullets", "chapters"}:
         style = "brief"
-
-    name = file.filename or "upload"
-    suffix = Path(name).suffix.lower()
-    if suffix not in ALLOWED:
+    filename = file.filename or "upload"
+    ext = Path(filename).suffix.lower()
+    if ext not in ALLOWED:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type '{suffix}'. Use video or audio: {', '.join(sorted(ALLOWED))}",
+            detail=f"Unsupported format '{ext}'. Upload audio ({', '.join(sorted(AUDIO_EXTS))}) or video ({', '.join(sorted(VIDEO_EXTS))}).",
         )
 
-    data = await file.read()
-    if not data:
-        raise HTTPException(status_code=400, detail="The uploaded file is empty.")
-    if len(data) > MAX_UPLOAD_MB * 1024 * 1024:
-        raise HTTPException(
-            status_code=413,
-            detail=f"File is too large. Max size is {MAX_UPLOAD_MB} MB.",
-        )
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, dir=UPLOAD_DIR) as tmp:
-        tmp.write(data)
-        tmp_path = Path(tmp.name)
+    dest = UPLOAD_DIR / filename
+    total = 0
+    with dest.open("wb") as handle:
+        while chunk := await file.read(1024 * 1024):
+            total += len(chunk)
+            if total > MAX_UPLOAD_MB * 1024 * 1024:
+                handle.close()
+                dest.unlink(missing_ok=True)
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"File exceeds the {MAX_UPLOAD_MB} MB limit.",
+                )
+            handle.write(chunk)
 
     try:
-        return summarize_upload(tmp_path, name, style)
+        return summarize_upload(dest, filename, style)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     finally:
-        tmp_path.unlink(missing_ok=True)
+        dest.unlink(missing_ok=True)

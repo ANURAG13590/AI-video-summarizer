@@ -7,7 +7,7 @@ import tempfile
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, Request, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -51,8 +51,21 @@ class UrlRequest(BaseModel):
     style: str = Field(default="brief")
 
 
+
+@app.get("/api/debug")
+@app.get("/debug")
+def debug_info(request: Request):
+    return {
+        "url_path": request.url.path,
+        "scope_path": request.scope.get("path"),
+        "raw_path": request.scope.get("raw_path", b"").decode("latin-1"),
+        "headers": dict(request.headers),
+    }
+
 @app.get("/")
-def index():
+def index(request: Request):
+    if "api" in request.url.path or "application/json" in request.headers.get("accept", ""):
+        return {"status": "AI Video Summarizer API ready", "ok": True}
     index_file = STATIC / "index.html"
     if not index_file.exists():
         index_file = ROOT / "index.html"
@@ -62,7 +75,7 @@ def index():
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
         return response
-    return {"status": "AI Video Summarizer API ready"}
+    return {"status": "AI Video Summarizer API ready", "ok": True}
 
 
 @app.get("/api/health")

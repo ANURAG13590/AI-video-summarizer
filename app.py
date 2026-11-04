@@ -30,6 +30,13 @@ except Exception:
     UPLOAD_DIR = Path(tempfile.gettempdir())
 
 app = FastAPI(title="AI Video Summarizer", version="1.0.0")
+
+@app.middleware("http")
+async def debug_path_middleware(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Debug-Path"] = request.url.path
+    return response
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

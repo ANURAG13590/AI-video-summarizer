@@ -715,7 +715,7 @@ def _ytdlp_attempts(**extra) -> list[dict]:
                 "format",
                 "140/139/249/251/ba/b/bestaudio/best/worstaudio/worst",
             ),
-            "extractor_args": {"youtube": {"player_client": ["android", "ios"]}},
+            "extractor_args": {"youtube": {"player_client": ["android"]}},
         },
         {
             **shared,
@@ -723,11 +723,11 @@ def _ytdlp_attempts(**extra) -> list[dict]:
                 "format",
                 "bestaudio/best/worstaudio/worst/ba/b",
             ),
-            "extractor_args": {"youtube": {"player_client": ["mweb", "web"]}},
+            "extractor_args": {"youtube": {"player_client": ["tv"]}},
         },
         {
             **shared,
-            "extractor_args": {"youtube": {"player_client": ["tvhtml5_simply_embedded_player"]}},
+            "extractor_args": {"youtube": {"player_client": ["mweb"]}},
         },
     ]
 

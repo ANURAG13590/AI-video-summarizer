@@ -323,13 +323,17 @@ def _llm_available() -> tuple[str | None, str | None]:
 
 
 def _chat_hf(system: str, user: str, hf_key: str) -> str:
-    """Call HuggingFace Inference API (free tier) using open models."""
-    models_to_try = [
+    """Call HuggingFace Inference API (free tier) using open models.
+    Falls back to OpenRouter free models if HF is unreachable.
+    """
+    hf_errors = []
+    # Try HuggingFace Inference API
+    hf_models = [
         "meta-llama/Meta-Llama-3.1-8B-Instruct",
         "mistralai/Mistral-7B-Instruct-v0.3",
         "HuggingFaceH4/zephyr-7b-beta",
     ]
-    for model_id in models_to_try:
+    for model_id in hf_models:
         try:
             resp = httpx.post(
                 f"https://api-inference.huggingface.co/models/{model_id}/v1/chat/completions",
@@ -347,12 +351,50 @@ def _chat_hf(system: str, user: str, hf_key: str) -> str:
             )
             if resp.status_code == 200:
                 data = resp.json()
-                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                if content:
-                    return content.strip()
+                msg_content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                if msg_content:
+                    return msg_content.strip()
+            else:
+                hf_errors.append(f"HF {model_id}: {resp.status_code} {resp.text[:100]}")
+        except Exception as exc:
+            hf_errors.append(f"HF {model_id}: {exc}")
+            continue
+
+    # Fallback: Try OpenRouter free models (no API key needed for some)
+    or_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    or_models = [
+        "google/gemma-2-9b-it:free",
+        "meta-llama/llama-3.2-3b-instruct:free",
+        "microsoft/phi-3-mini-128k-instruct:free",
+        "mistralai/mistral-7b-instruct:free",
+    ]
+    or_headers = {"Content-Type": "application/json"}
+    if or_key:
+        or_headers["Authorization"] = f"Bearer {or_key}"
+    for or_model in or_models:
+        try:
+            resp = httpx.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=or_headers,
+                json={
+                    "model": or_model,
+                    "messages": [
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user},
+                    ],
+                    "max_tokens": 1800,
+                },
+                timeout=90,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                msg_content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                if msg_content:
+                    return msg_content.strip()
         except Exception:
             continue
-    raise RuntimeError("HuggingFace inference failed on all models.")
+
+    raise RuntimeError(f"All LLM backends failed. HF errors: {hf_errors[:2]}")
 
 
 def _chat(system: str, user: str) -> str:

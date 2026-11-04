@@ -94,7 +94,10 @@ function getApiUrl(endpoint) {
     return endpoint;
   }
   const custom = localStorage.getItem("ai_backend_url");
-  if (custom) return custom.replace(/\/+$/, "") + endpoint;
+  if (custom && !custom.includes("trycloudflare.com")) return custom.replace(/\/+$/, "") + endpoint;
+  if (custom && custom.includes("trycloudflare.com")) {
+    localStorage.removeItem("ai_backend_url");
+  }
   return "https://ai-video-summarizer-zv8y.vercel.app" + endpoint;
 }
 

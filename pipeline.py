@@ -613,14 +613,16 @@ def _ytdlp_base_opts(**extra) -> dict:
 
 
 def _ytdlp_attempts(**extra) -> list[dict]:
-    """Try smaller web formats first, then android fallback for bot-blocked IPs."""
-    socket_timeout = extra.pop("socket_timeout", 120)
-    retries = extra.pop("retries", 10)
-    fragment_retries = extra.pop("fragment_retries", 10)
+    """Android client first to bypass datacenter/cloud IP blocks, then mweb/tv."""
+    socket_timeout = extra.pop("socket_timeout", 45)
+    retries = extra.pop("retries", 5)
+    fragment_retries = extra.pop("fragment_retries", 5)
     shared = _ytdlp_base_opts(
         socket_timeout=socket_timeout,
         retries=retries,
         fragment_retries=fragment_retries,
+        writesubtitles=True,
+        writeautomaticsub=True,
         **extra,
     )
     return [
@@ -630,7 +632,7 @@ def _ytdlp_attempts(**extra) -> list[dict]:
                 "format",
                 "140/139/249/251/ba/b/bestaudio/best/worstaudio/worst",
             ),
-            "extractor_args": {"youtube": {"player_client": ["web", "android"]}},
+            "extractor_args": {"youtube": {"player_client": ["android", "ios"]}},
         },
         {
             **shared,
@@ -638,7 +640,11 @@ def _ytdlp_attempts(**extra) -> list[dict]:
                 "format",
                 "bestaudio/best/worstaudio/worst/ba/b",
             ),
-            "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+            "extractor_args": {"youtube": {"player_client": ["mweb", "web"]}},
+        },
+        {
+            **shared,
+            "extractor_args": {"youtube": {"player_client": ["tvhtml5_simply_embedded_player"]}},
         },
     ]
 
@@ -653,7 +659,9 @@ def _run_ytdlp(info_or_download: str, url: str, **extra):
                 if info_or_download == "download":
                     ydl.download([url])
                     return opts
-                return ydl.extract_info(url, download=False)
+                info = ydl.extract_info(url, download=False)
+                if info:
+                    return info
         except Exception as exc:
             last_error = exc
     if last_error:

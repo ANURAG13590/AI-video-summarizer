@@ -3,194 +3,134 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Summify — AI Video Summarizer</title>
+    <title>Summify Pro — AI Video Summarizer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/static/styles.css?v=apple10" />
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/styles.css?v=apple_macbook_pro_v1" />
   </head>
   <body>
 
-    <!-- ─── NAV ─── -->
-    <header class="nav" id="nav">
-      <div class="nav-inner">
-        <a class="brand" href="#hero">
-          <svg class="brand-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="28" height="28" rx="8" fill="url(#grad)"/>
-            <path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#6366f1"/>
-                <stop offset="1" stop-color="#a855f7"/>
-              </linearGradient>
-            </defs>
+    <!-- ─── APPLE GLOBAL NAV BAR ─── -->
+    <header class="apple-nav" id="nav">
+      <div class="apple-nav-inner">
+        <!-- Apple Logo -->
+        <a class="nav-apple-logo" href="#hero" aria-label="Apple">
+          <svg viewBox="0 0 17 21" width="15" height="18" fill="currentColor">
+            <path d="M15.22 17.65c-.8 1.16-1.63 2.32-2.94 2.34-1.28.03-1.69-.76-3.15-.76-1.46 0-1.92.74-3.15.78-1.28.05-2.22-1.29-3.03-2.45-1.66-2.4-2.93-6.78-1.22-9.75.85-1.47 2.37-2.4 4.02-2.43 1.25-.03 2.44.84 3.2.84.77 0 2.2-.99 3.73-.84 1.28.05 2.45.52 3.25 1.34-2.82 1.7-2.36 5.46.46 6.67-.6 1.54-1.39 3.07-2.17 4.26zM11.96 5.34c.64-.78 1.08-1.86.96-2.95-.92.04-2.04.62-2.7 1.39-.58.67-1.08 1.75-.95 2.82 1.03.08 2.05-.48 2.69-1.26z"/>
           </svg>
-          Summify
         </a>
+
+        <!-- Apple Navigation Links -->
         <nav class="nav-links">
-          <a href="#features">Features</a>
-          <a href="#how">How it works</a>
-          <a href="#summarizer" class="nav-cta">Try it free</a>
+          <a href="#hero">Store</a>
+          <a href="#hero" class="active">Mac</a>
+          <a href="#features">iPad</a>
+          <a href="#features">iPhone</a>
+          <a href="#features">Watch</a>
+          <a href="#features">AirPods</a>
+          <a href="#how">Home</a>
+          <a href="#how">Entertainment</a>
+          <a href="#summarizer">Accessories</a>
+          <a href="#summarizer">Support</a>
         </nav>
+
+        <!-- Search & Bag Icons -->
+        <div class="nav-icons">
+          <a href="#summarizer" aria-label="Search">
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.3">
+              <circle cx="6.5" cy="6.5" r="5"/>
+              <path d="M10 10l4.5 4.5" stroke-linecap="round"/>
+            </svg>
+          </a>
+          <a href="#summarizer" aria-label="Bag">
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.3">
+              <path d="M4 5h8v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5z"/>
+              <path d="M6 5V3.5a2 2 0 0 1 4 0V5"/>
+            </svg>
+          </a>
+        </div>
+
         <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
-          <span></span><span></span><span></span>
+          <span></span><span></span>
         </button>
       </div>
     </header>
 
-    <!-- ─── HERO / FRONT PAGE ─── -->
-    <section class="hero" id="hero">
-      <div class="hero-bg">
-        <div class="orb orb1"></div>
-        <div class="orb orb2"></div>
-        <div class="orb orb3"></div>
-      </div>
-      <div class="hero-inner">
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          Powered by Whisper AI &amp; Gemini
-        </div>
-        <h1 class="hero-title">
-          Every video,<br />
-          <span class="gradient-text">perfectly summarized.</span>
-        </h1>
-        <p class="hero-sub">
-          Paste a YouTube link or upload a file. Get a clear overview, key
-          points, chapters, and quotes — in seconds, not hours.
+    <!-- ─── APPLE RIBBON PROMO ─── -->
+    <div class="apple-ribbon">
+      Get instantaneous AI video intelligence with ultra-fast Whisper speech recognition &amp; Groq LLM. <a href="#summarizer">Try Summarizer &#8250;</a>
+    </div>
+
+    <!-- ─── MACBOOK PRO HERO (EXACT APPLE REPLICA) ─── -->
+    <section class="apple-hero" id="hero">
+      <div class="apple-hero-header">
+        <h1 class="mac-title">MacBook Pro</h1>
+        <p class="mac-subtitle">
+          <span class="pro-gold">PRO</span>LED <span class="xdr-blue">XDR Display</span>
         </p>
-        <div class="hero-actions">
-          <a href="#summarizer" class="btn btn-primary">
-            <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            Summarize a video
-          </a>
-          <a href="#how" class="btn btn-ghost">See how it works</a>
-        </div>
-        <div class="hero-stats">
-          <div class="stat"><span class="stat-num">10×</span><span class="stat-label">Faster than watching</span></div>
-          <div class="stat-sep"></div>
-          <div class="stat"><span class="stat-num">4</span><span class="stat-label">Summary styles</span></div>
-          <div class="stat-sep"></div>
-          <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Private &amp; local</span></div>
+        <p class="mac-date">Powered by AI Video Summarizer Engine</p>
+        <div class="mac-cta-group">
+          <a href="#summarizer" class="btn-apple-pill btn-apple-blue">Summarize now</a>
+          <a href="#how" class="btn-apple-pill btn-apple-outline">Learn more</a>
         </div>
       </div>
 
-      <!-- Hero visual -->
-      <div class="hero-visual">
-        <div class="card-mock">
-          <div class="card-mock-header">
-            <div class="dots"><span></span><span></span><span></span></div>
-            <div class="card-mock-url">youtube.com/watch?v=…</div>
+      <!-- Real CSS-rendered Apple MacBook Open Display with XDR PRO Glowing Wall -->
+      <div class="macbook-device-wrapper">
+        <div class="macbook-device">
+          <!-- Lid / Screen -->
+          <div class="macbook-screen">
+            <div class="macbook-bezel">
+              <div class="macbook-notch">
+                <span class="notch-camera"></span>
+              </div>
+              <div class="macbook-display-content">
+                <!-- XDR OLED Light Waves Graphic (matching the PRO graphic on image) -->
+                <div class="pro-wall-art">
+                  <div class="wall-col c1"></div>
+                  <div class="wall-col c2"></div>
+                  <div class="wall-col c3"></div>
+                  <div class="wall-letter-p"></div>
+                  <div class="wall-letter-r"></div>
+                  <div class="wall-letter-o"></div>
+                  <div class="wall-col c4"></div>
+                  <div class="wall-col c5"></div>
+                  <div class="wall-col c6"></div>
+                  <div class="display-reflection"></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="card-mock-body">
-            <div class="mock-line mock-title"></div>
-            <div class="mock-tag">Overview</div>
-            <div class="mock-line w80"></div>
-            <div class="mock-line w90"></div>
-            <div class="mock-line w60"></div>
-            <div class="mock-tag">Key Points</div>
-            <div class="mock-bullet"><span class="mock-dot"></span><div class="mock-line w70"></div></div>
-            <div class="mock-bullet"><span class="mock-dot"></span><div class="mock-line w85"></div></div>
-            <div class="mock-bullet"><span class="mock-dot"></span><div class="mock-line w55"></div></div>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- ─── FEATURES ─── -->
-    <section class="features" id="features">
-      <div class="section-inner">
-        <p class="section-eyebrow">Why Summify</p>
-        <h2 class="section-title">Built for people who value their time</h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <!-- Base / Keyboard Body -->
+          <div class="macbook-base">
+            <div class="macbook-keyboard-deck">
+              <div class="macbook-speaker left"></div>
+              <div class="macbook-keyboard">
+                <div class="kb-row f-keys">
+                  <span>esc</span><span>F1</span><span>F2</span><span>F3</span><span>F4</span><span>F5</span><span>F6</span><span>F7</span><span>F8</span><span>F9</span><span>F10</span><span>F11</span><span>F12</span><span class="touch-id"></span>
+                </div>
+                <div class="kb-row num-row">
+                  <span>~</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span><span>-</span><span>+</span><span>delete</span>
+                </div>
+              </div>
+              <div class="macbook-speaker right"></div>
             </div>
-            <h3>Captions first</h3>
-            <p>YouTube subtitles are used when available — making most links lightning fast.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z" stroke="currentColor" stroke-width="1.5"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 19v3M8 22h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <h3>Whisper transcription</h3>
-            <p>Uploads and caption-less videos are transcribed locally with Whisper — no cloud needed.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M9 12h6M9 16h4M7 8h10M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <h3>4 summary styles</h3>
-            <p>Brief, Detailed, Bullets, or Chapters — choose the format that fits your workflow.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h3>Private by default</h3>
-            <p>Everything runs on your machine. No data ever leaves your computer.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h3>Export anywhere</h3>
-            <p>Copy the summary or download it as Markdown — overview, points, and full transcript.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M15 10l-4 4-2-2M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h3>Any format</h3>
-            <p>MP4, MKV, MOV, MP3, WAV, M4A — supports virtually every video and audio format.</p>
+            <div class="macbook-notch-lip"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ─── HOW IT WORKS ─── -->
-    <section class="how" id="how">
-      <div class="section-inner">
-        <p class="section-eyebrow">How it works</p>
-        <h2 class="section-title">Three steps to your brief</h2>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">01</div>
-            <div class="step-body">
-              <h3>Paste or upload</h3>
-              <p>Drop in any YouTube link or upload a local video or audio file.</p>
-            </div>
-          </div>
-          <div class="step-arrow">
-            <svg viewBox="0 0 24 6" fill="none"><path d="M0 3h22M19 0l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div class="step">
-            <div class="step-num">02</div>
-            <div class="step-body">
-              <h3>AI reads it</h3>
-              <p>Captions are grabbed instantly; if unavailable, Whisper transcribes the audio.</p>
-            </div>
-          </div>
-          <div class="step-arrow">
-            <svg viewBox="0 0 24 6" fill="none"><path d="M0 3h22M19 0l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div class="step">
-            <div class="step-num">03</div>
-            <div class="step-body">
-              <h3>Get your brief</h3>
-              <p>Overview, key points, chapters, and quotes — copy or download in one click.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ─── APP / SUMMARIZER ─── -->
+    <!-- ─── SUMMARIZER CONSOLE (APPLE TITANIUM SLATE) ─── -->
     <section class="app-section" id="summarizer">
       <div class="section-inner">
-        <p class="section-eyebrow">Start summarizing</p>
-        <h2 class="section-title">Paste a link. Get the brief.</h2>
-        <p class="section-sub" id="engineStatus">Checking engine…</p>
+        <div class="headline-container">
+          <p class="section-eyebrow">AI Video Summarizer</p>
+          <h2 class="section-title">The brief, without the watch.</h2>
+          <p class="section-sub" id="engineStatus">Checking engine…</p>
+        </div>
 
         <div class="panel">
           <div class="tabs" role="tablist">
@@ -200,12 +140,12 @@
             </button>
             <button class="tab" data-tab="file" type="button">
               <svg viewBox="0 0 20 20" fill="none"><path d="M4 4a2 2 0 0 1 2-2h5l5 5v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z" stroke="currentColor" stroke-width="1.3"/><path d="M11 2v5h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-              Upload File
+              Upload Media
             </button>
           </div>
 
           <form id="urlForm" class="form">
-            <label for="url">Video link</label>
+            <label for="url">Video Link</label>
             <div class="input-wrap">
               <svg class="input-icon" viewBox="0 0 20 20" fill="none"><path d="M12.9 7.1a4.5 4.5 0 0 1 0 6.36l-1.42 1.42a4.5 4.5 0 1 1-6.36-6.36l1-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7.1 12.9a4.5 4.5 0 0 1 0-6.36l1.42-1.42a4.5 4.5 0 0 1 6.36 6.36l-1 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               <input
@@ -221,7 +161,7 @@
             </div>
             <div class="row">
               <fieldset>
-                <legend>Summary style</legend>
+                <legend>Summary Style</legend>
                 <label class="chip"><input type="radio" name="style" value="brief" checked /><span>Brief</span></label>
                 <label class="chip"><input type="radio" name="style" value="detailed" /><span>Detailed</span></label>
                 <label class="chip"><input type="radio" name="style" value="bullets" /><span>Bullets</span></label>
@@ -235,18 +175,18 @@
           </form>
 
           <form id="fileForm" class="form hidden">
-            <label for="file">Video or audio file</label>
+            <label for="file">Video or Audio File</label>
             <label class="drop" for="file" id="dropZone">
               <input id="file" name="file" type="file" accept="video/*,audio/*" required />
               <div class="drop-inner">
                 <svg class="drop-icon" viewBox="0 0 48 48" fill="none"><path d="M24 32V16M16 24l8-8 8 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 32v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                <span class="drop-title" id="fileLabel">Click to choose or drag &amp; drop</span>
-                <span class="hint">MP4, MKV, MOV, MP3, WAV, M4A — video files need FFmpeg</span>
+                <span class="drop-title" id="fileLabel">Click to choose or drag &amp; drop file</span>
+                <span class="hint">MP4, MKV, MOV, MP3, WAV, M4A supported</span>
               </div>
             </label>
             <div class="row">
               <fieldset>
-                <legend>Summary style</legend>
+                <legend>Summary Style</legend>
                 <label class="chip"><input type="radio" name="fileStyle" value="brief" checked /><span>Brief</span></label>
                 <label class="chip"><input type="radio" name="fileStyle" value="detailed" /><span>Detailed</span></label>
                 <label class="chip"><input type="radio" name="fileStyle" value="bullets" /><span>Bullets</span></label>
@@ -260,14 +200,14 @@
           </form>
         </div>
 
-        <!-- Progress & Error -->
+        <!-- Progress & Error Elements -->
         <div class="progress-wrap hidden" id="progressWrap">
           <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
           <p class="progress" id="progress" aria-live="polite"></p>
         </div>
         <p class="error hidden" id="error"></p>
 
-        <!-- Result -->
+        <!-- Result Container -->
         <section class="result hidden" id="result">
           <div class="result-header">
             <img id="thumb" alt="" hidden />
@@ -279,7 +219,7 @@
           <div class="actions">
             <button type="button" id="copyBtn" class="btn btn-sm">
               <svg viewBox="0 0 20 20" fill="none"><path d="M8 4H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3M8 4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V4z" stroke="currentColor" stroke-width="1.5"/></svg>
-              Copy summary
+              Copy Summary
             </button>
             <button type="button" class="btn btn-sm btn-ghost" id="downloadBtn">
               <svg viewBox="0 0 20 20" fill="none"><path d="M17 13v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3M10 3v9M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -292,7 +232,7 @@
               <p id="overview"></p>
             </div>
             <div class="result-section">
-              <h3 class="result-label">Key points</h3>
+              <h3 class="result-label">Key Points</h3>
               <ul id="bullets"></ul>
             </div>
             <div id="chaptersWrap" class="result-section hidden">
@@ -304,7 +244,7 @@
               <ul id="quotes"></ul>
             </div>
             <details class="transcript-details">
-              <summary>Full transcript</summary>
+              <summary>Full Transcript</summary>
               <pre id="transcript"></pre>
             </details>
           </div>
@@ -312,26 +252,108 @@
       </div>
     </section>
 
-    <!-- ─── FOOTER ─── -->
+    <!-- ─── APPLE BENTO FEATURES ─── -->
+    <section class="features" id="features">
+      <div class="section-inner">
+        <p class="section-eyebrow">Innovation</p>
+        <h2 class="section-title">Engineered to be extraordinary.</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Captions First</h3>
+            <p>Fast subtitle indexing delivers summaries in fractions of a second for eligible YouTube media.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z" stroke="currentColor" stroke-width="1.5"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 19v3M8 22h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <h3>Whisper Precision</h3>
+            <p>High-fidelity neural audio transcription parses speech even with heavy background acoustic noise.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M9 12h6M9 16h4M7 8h10M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <h3>4 Structured Formats</h3>
+            <p>Tailored briefs, analytical bullet matrices, narrative sections, and chapter-by-chapter breakdowns.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Security Architecture</h3>
+            <p>Private local pipeline with zero permanent data retention on external telemetry clouds.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Instant Export</h3>
+            <p>Seamlessly generate formatted Markdown or copy rich structured briefs directly to clipboard.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M15 10l-4 4-2-2M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Multilingual to English</h3>
+            <p>Automatic translation converts Hindi and multilingual video dialogue into fluent English briefs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── HOW IT WORKS ─── -->
+    <section class="how" id="how">
+      <div class="section-inner">
+        <p class="section-eyebrow">Simplicity</p>
+        <h2 class="section-title">Effortless intelligence in three steps.</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <h3>Paste or drop</h3>
+              <p>Supply any YouTube link or upload audio/video from your device.</p>
+            </div>
+          </div>
+          <div class="step-arrow">
+            <svg viewBox="0 0 24 6" fill="none"><path d="M0 3h22M19 0l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <h3>Neural Extraction</h3>
+              <p>Whisper and Groq LLM transcribe, translate, and extract core ideas.</p>
+            </div>
+          </div>
+          <div class="step-arrow">
+            <svg viewBox="0 0 24 6" fill="none"><path d="M0 3h22M19 0l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-body">
+              <h3>Take action</h3>
+              <p>Study key takeaways, review timestamps, or download the markdown report.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── APPLE FOOTER ─── -->
     <footer class="footer">
       <div class="footer-inner">
         <div class="footer-brand">
-          <svg class="brand-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="28" height="28" rx="8" fill="url(#grad2)"/>
-            <path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="grad2" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#6366f1"/>
-                <stop offset="1" stop-color="#a855f7"/>
-              </linearGradient>
-            </defs>
+          <svg viewBox="0 0 17 21" width="16" height="19" fill="#86868b">
+            <path d="M15.22 17.65c-.8 1.16-1.63 2.32-2.94 2.34-1.28.03-1.69-.76-3.15-.76-1.46 0-1.92.74-3.15.78-1.28.05-2.22-1.29-3.03-2.45-1.66-2.4-2.93-6.78-1.22-9.75.85-1.47 2.37-2.4 4.02-2.43 1.25-.03 2.44.84 3.2.84.77 0 2.2-.99 3.73-.84 1.28.05 2.45.52 3.25 1.34-2.82 1.7-2.36 5.46.46 6.67-.6 1.54-1.39 3.07-2.17 4.26zM11.96 5.34c.64-.78 1.08-1.86.96-2.95-.92.04-2.04.62-2.7 1.39-.58.67-1.08 1.75-.95 2.82 1.03.08 2.05-.48 2.69-1.26z"/>
           </svg>
-          <span>Summify</span>
+          <span>Summify Pro</span>
         </div>
-        <p class="footer-note">Local app — your data never leaves your machine. YouTube captions are used first; Whisper runs only when needed.</p>
+        <p class="footer-note">Copyright &copy; 2026 Apple-inspired AI Video Intelligence Interface. Private, local, and neural-powered.</p>
       </div>
     </footer>
 
-    <script src="/static/app.js?v=apple10"></script>
+    <script src="/static/app.js?v=apple_macbook_pro_v1"></script>
   </body>
 </html>

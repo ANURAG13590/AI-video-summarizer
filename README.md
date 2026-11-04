@@ -1,26 +1,28 @@
-# AI Video Summarizer
+---
+title: AI Video Summarizer
+emoji: 🎬
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8000
+pinned: false
+---
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ANURAG13590/AI-video-summarizer)
+# AI Video Summarizer
 
 Paste a YouTube URL or upload a local video/audio file. The app grabs a transcript, then writes an overview, key points, chapters, and quotes.
 
-## 🚀 24/7 Cloud Deployment (Always Online)
+## 🚀 100% Free 24/7 Hosting on Hugging Face Spaces (No Credit Card Required)
 
-Click the **Deploy to Render** button above, or follow these 3 steps:
-
-1. Sign up / log in to [Render.com](https://render.com) (100% free tier).
-2. Click **New +** → **Blueprint** → Connect your GitHub repository `ANURAG13590/AI-video-summarizer`.
-3. Enter your `GROQ_API_KEY` when prompted and click **Apply**.
-
-Render will deploy the app and give you a permanent public URL (e.g. `https://ai-video-summarizer.onrender.com`) that runs 24/7 without needing your computer on.
+1. Open [huggingface.co/new-space](https://huggingface.co/new-space)
+2. Choose a name: `ai-video-summarizer`
+3. Under **Space SDK**, select **Docker**
+4. Under **Space hardware**, select **Free (CPU basic · 2 vCPU · 16GB RAM)**
+5. Connect your GitHub repository `ANURAG13590/AI-video-summarizer`
+6. Add `GROQ_API_KEY` under **Settings** → **Variables and secrets**
+7. Your permanent 24/7 URL will be: `https://<your-username>-ai-video-summarizer.hf.space`
 
 ---
-
-## How it works
-
-1. **YouTube captions first** — no download if the video has subtitles.
-2. **Whisper fallback** — if captions are missing, or you upload a file, audio is transcribed with Groq or OpenAI Whisper.
-3. **LLM summary** — Groq Llama (default) or OpenAI.
 
 ## Local Setup
 

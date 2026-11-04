@@ -6,80 +6,185 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>MacBook Pro — Apple</title>
-    <link rel="stylesheet" href="/static/styles.css?t=apple_macbook_official_final_v1" />
+    <title>Summarize AI — Mind-Blowing Video Intelligence</title>
+    <link rel="stylesheet" href="/static/styles.css?t=v2_ai_video_final" />
   </head>
   <body>
 
-    <!-- ─── 1. APPLE OFFICIAL GLOBAL NAVIGATION ─── -->
-    <header class="apple-nav">
-      <div class="apple-nav-inner">
-        <!-- Apple Logo -->
-        <a class="nav-icon apple-logo" href="#hero" aria-label="Apple">
-          <svg viewBox="0 0 17 21" width="14" height="18" fill="currentColor">
-            <path d="M15.22 17.65c-.8 1.16-1.63 2.32-2.94 2.34-1.28.03-1.69-.76-3.15-.76-1.46 0-1.92.74-3.15.78-1.28.05-2.22-1.29-3.03-2.45-1.66-2.4-2.93-6.78-1.22-9.75.85-1.47 2.37-2.4 4.02-2.43 1.25-.03 2.44.84 3.2.84.77 0 2.2-.99 3.73-.84 1.28.05 2.45.52 3.25 1.34-2.82 1.7-2.36 5.46.46 6.67-.6 1.54-1.39 3.07-2.17 4.26zM11.96 5.34c.64-.78 1.08-1.86.96-2.95-.92.04-2.04.62-2.7 1.39-.58.67-1.08 1.75-.95 2.82 1.03.08 2.05-.48 2.69-1.26z"/>
-          </svg>
+    <!-- ─── 1. FROSTED GLASS NAVIGATION ─── -->
+    <header class="brand-nav" id="nav">
+      <div class="brand-nav-inner">
+        <!-- AI Video Summarizer Brand Logo -->
+        <a class="nav-brand" href="#hero" aria-label="Summarize AI">
+          <span class="brand-symbol">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+              <defs>
+                <linearGradient id="logoGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2997ff" />
+                  <stop offset="0.5" stop-color="#70baff" />
+                  <stop offset="1" stop-color="#ffb340" />
+                </linearGradient>
+              </defs>
+              <rect x="3" y="3" width="18" height="18" rx="5" stroke="url(#logoGrad)" stroke-width="2" />
+              <polygon points="10,8 16,12 10,16" fill="url(#logoGrad)" />
+              <circle cx="17.5" cy="6.5" r="1.8" fill="#ffb340" />
+            </svg>
+          </span>
+          <span class="brand-text">Summarize<span class="brand-accent">AI</span></span>
         </a>
 
-        <!-- Apple Store Links -->
+        <!-- Product Navigation Links -->
         <nav class="nav-links">
-          <a href="#hero">Store</a>
-          <a href="#hero" class="active">Mac</a>
-          <a href="#summarizer">iPad</a>
-          <a href="#summarizer">iPhone</a>
-          <a href="#summarizer">Watch</a>
-          <a href="#summarizer">AirPods</a>
-          <a href="#summarizer">Home</a>
-          <a href="#summarizer">Entertainment</a>
-          <a href="#summarizer">Accessories</a>
-          <a href="#summarizer">Support</a>
+          <a href="#summarizer" class="active">Summarizer</a>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#summarizer" id="navUploadLink">Upload File</a>
         </nav>
 
-        <!-- Search & Bag -->
+        <!-- Right Side Actions & Live Status -->
         <div class="nav-actions">
-          <a class="nav-icon" href="#summarizer" aria-label="Search">
-            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.3">
-              <circle cx="6.5" cy="6.5" r="5"/>
-              <path d="M10 10l4.5 4.5" stroke-linecap="round"/>
-            </svg>
+          <a href="#summarizer" class="nav-status-pill" title="Engine Status">
+            <span class="pulse-indicator"></span>
+            <span class="status-text" id="navStatusBadge">Engine Active</span>
           </a>
-          <a class="nav-icon" href="#summarizer" aria-label="Bag">
-            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.3">
-              <path d="M4 5h8v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5z"/>
-              <path d="M6 5V3.5a2 2 0 0 1 4 0V5"/>
-            </svg>
-          </a>
+          <a href="#summarizer" class="nav-cta-btn">Get Started</a>
+          <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
       </div>
     </header>
 
-    <!-- ─── 2. APPLE PROMO RIBBON (FROM SCREENSHOT) ─── -->
-    <div class="apple-ribbon">
-      Get up to 12 months of No Cost EMI plus up to &#8377;15000 instant cashback on selected products with eligible cards.&#8225;
-      <a href="#summarizer">Shop &#8250;</a>
+    <!-- ─── 2. ANNOUNCEMENT RIBBON ─── -->
+    <div class="top-ribbon">
+      <span class="ribbon-badge">NEW</span>
+      Powered by Whisper neural transcription &amp; multi-style LLM intelligence.
+      <a href="#summarizer">Try a video now &#8250;</a>
     </div>
 
-    <!-- ─── 3. EXACT HERO SECTION MATCHING SCREENSHOT ─── -->
-    <section class="apple-hero" id="hero">
+    <!-- ─── 3. HERO SECTION (AI VIDEO SUMMARIZER) ─── -->
+    <section class="brand-hero" id="hero">
       <div class="hero-content">
-        <h1 class="hero-title">MacBook Pro</h1>
+        <p class="hero-eyebrow">AI Video Summarizer</p>
+        <h1 class="hero-title">Turn hours of video<br/>into minutes of insight.</h1>
         <p class="hero-subtitle">
-          <span class="pro-gold">PRO</span>LED <span class="xdr-blue">XDR Display</span>
+          <span class="pro-gold">Whisper</span> Precision. <span class="xdr-blue">Instant Clarity.</span>
         </p>
-        <p class="hero-date">Available from 9 November</p>
+        <p class="hero-date">
+          Paste any YouTube link or upload audio and video files. Extract clean summaries, key takeaways, and timestamped chapters in seconds.
+        </p>
         <div class="hero-buttons">
-          <a href="#summarizer" class="btn-pill btn-blue">Learn more</a>
-          <a href="#summarizer" class="btn-pill btn-outline">Pre-order</a>
+          <a href="#summarizer" class="btn-pill btn-blue">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor">
+              <path d="M6.3 3.1c-.8-.5-1.8.1-1.8 1.1v11.6c0 1 1 1.6 1.8 1.1l9.3-5.8c.8-.5.8-1.7 0-2.2L6.3 3.1z"/>
+            </svg>
+            Start Summarizing
+          </a>
+          <a href="#features" class="btn-pill btn-outline">Explore Capabilities</a>
         </div>
       </div>
 
-      <!-- EXACT MACBOOK LAPTOP IMAGE FROM USER SCREENSHOT -->
+      <!-- ─── HARDWARE & APP SHOWCASE MOCKUP ─── -->
       <div class="hero-image-wrap">
-        <img
-          src="/static/macbook_apple_hero.png"
-          alt="MacBook Pro PROLED XDR Display"
-          class="macbook-hero-img"
-        />
+        <div class="showcase-frame">
+          <div class="showcase-topbar">
+            <div class="window-controls">
+              <span class="control-dot dot-close"></span>
+              <span class="control-dot dot-min"></span>
+              <span class="control-dot dot-max"></span>
+            </div>
+            <div class="showcase-address">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.3">
+                <rect x="2" y="3" width="12" height="10" rx="2"/>
+                <circle cx="8" cy="8" r="2"/>
+              </svg>
+              <span>youtube.com/watch?v=neural-video-architecture</span>
+            </div>
+            <div class="showcase-status">
+              <span class="pulse-dot"></span> 4K Neural Transcribe
+            </div>
+          </div>
+
+          <div class="showcase-body">
+            <!-- Left: Video Player Mockup -->
+            <div class="showcase-left">
+              <div class="showcase-video-preview">
+                <div class="video-overlay">
+                  <span class="video-badge">08:45 / 42:10</span>
+                  <div class="video-play-center">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                  <div class="video-waveform">
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                  </div>
+                </div>
+                <div class="video-info">
+                  <p class="video-title-demo">Next-Gen Multimodal Architecture &amp; Speech Intelligence</p>
+                  <div class="video-tags">
+                    <span class="vtag">1080p 60fps</span>
+                    <span class="vtag">Whisper Neural</span>
+                    <span class="vtag highlight">99.4% Accuracy</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Live AI Summary Stream -->
+            <div class="showcase-right">
+              <div class="showcase-ai-header">
+                <div class="ai-badge">
+                  <svg viewBox="0 0 20 20" width="13" height="13" fill="currentColor">
+                    <path d="M10 2l1.6 5 5 1.6-5 1.6-1.6 5-1.6-5-5-1.6 5-1.6 1.6-5z"/>
+                  </svg>
+                  AI Synthesis
+                </div>
+                <span class="ai-time">Generated in 1.2s</span>
+              </div>
+
+              <div class="showcase-insight">
+                <h4 class="insight-headline">Executive Overview</h4>
+                <p class="insight-p">
+                  The speaker demonstrates how speculative token decoding cuts latency by 68% while preserving full semantic coherence across long-form video lectures.
+                </p>
+              </div>
+
+              <div class="showcase-chapters">
+                <h4 class="insight-headline">Timestamped Chapters</h4>
+                <div class="demo-ch-list">
+                  <div class="demo-ch-item active">
+                    <span class="demo-ts">00:00</span>
+                    <span class="demo-title">Architecture Overview</span>
+                  </div>
+                  <div class="demo-ch-item">
+                    <span class="demo-ts">03:45</span>
+                    <span class="demo-title">Whisper Speech Pipeline</span>
+                  </div>
+                  <div class="demo-ch-item">
+                    <span class="demo-ts">11:20</span>
+                    <span class="demo-title">Latency &amp; VRAM Benchmarks</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -87,8 +192,8 @@
     <section class="app-section" id="summarizer">
       <div class="section-inner">
         <div class="section-header">
-          <p class="section-eyebrow">AI Video Summarizer</p>
-          <h2 class="section-headline">Mind-blowing intelligence. Built in.</h2>
+          <p class="section-eyebrow">Processing Engine</p>
+          <h2 class="section-headline">Drop any video. Get instant clarity.</h2>
           <p class="section-status" id="engineStatus">Checking engine…</p>
         </div>
 
@@ -212,13 +317,138 @@
       </div>
     </section>
 
-    <!-- ─── 5. APPLE FOOTER ─── -->
+    <!-- ─── 5. BENTO FEATURES SECTION ─── -->
+    <section class="features-section" id="features">
+      <div class="section-inner">
+        <div class="section-header">
+          <p class="section-eyebrow">Engineered for Precision</p>
+          <h2 class="section-headline">Every frame understood.</h2>
+          <p class="section-status">Advanced neural processing delivers crystal-clear synthesis at lightning speed.</p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Card 1 -->
+          <div class="bento-card card-glow-cyan">
+            <div class="bento-icon-wrap icon-cyan">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+              </svg>
+            </div>
+            <h3 class="bento-title">Whisper Neural Transcribe</h3>
+            <p class="bento-desc">
+              State-of-the-art acoustic transcription decodes accents, technical jargon, and multi-speaker dialogues with extraordinary accuracy.
+            </p>
+            <div class="bento-metric">
+              <span class="metric-num">99.4%</span>
+              <span class="metric-label">Speech fidelity across 99+ languages</span>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bento-card card-glow-gold">
+            <div class="bento-icon-wrap icon-gold">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 6h16M4 12h10M4 18h14"/>
+                <circle cx="19" cy="12" r="2.5" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3 class="bento-title">4 Tailored Styles</h3>
+            <p class="bento-desc">
+              Choose how you want your information: quick executive briefings, comprehensive breakdowns, actionable bullet points, or chaptered timelines.
+            </p>
+            <div class="bento-metric">
+              <span class="metric-num">4 Modes</span>
+              <span class="metric-label">Brief · Detailed · Bullets · Chapters</span>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bento-card card-glow-blue">
+            <div class="bento-icon-wrap icon-blue">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="3" width="20" height="14" rx="3"/>
+                <path d="M8 21h8M12 17v4"/>
+              </svg>
+            </div>
+            <h3 class="bento-title">Universal Media Ingestion</h3>
+            <p class="bento-desc">
+              Paste direct YouTube URLs or drag and drop local files — MP4, MKV, MOV, MP3, WAV, and M4A. Export results directly to Markdown with one click.
+            </p>
+            <div class="bento-metric">
+              <span class="metric-num">1-Click</span>
+              <span class="metric-label">Instant clipboard copy &amp; Markdown (.md)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 6. HOW IT WORKS SECTION ─── -->
+    <section class="how-section" id="how-it-works">
+      <div class="section-inner">
+        <div class="section-header">
+          <p class="section-eyebrow">Simplicity by Design</p>
+          <h2 class="section-headline">Three steps to clarity.</h2>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <span class="step-badge">01</span>
+            <h4 class="step-title">Paste or Upload</h4>
+            <p class="step-desc">Enter any YouTube link or drop an audio/video file directly into the neural console.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-badge">02</span>
+            <h4 class="step-title">Neural Ingestion</h4>
+            <p class="step-desc">Whisper decodes the audio track, extracts captions, and detects thematic chapter transitions.</p>
+          </div>
+          <div class="step-card">
+            <span class="step-badge">03</span>
+            <h4 class="step-title">Instant Insight</h4>
+            <p class="step-desc">Read executive takeaways, jump directly to chapters, and export structured Markdown notes.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 7. REFINED FOOTER ─── -->
     <footer class="footer">
       <div class="footer-inner">
-        <p class="footer-note">Copyright &copy; 2026 Apple Inc. All rights reserved. Built with Whisper neural speech transcription &amp; LLM intelligence.</p>
+        <div class="footer-brand">
+          <span class="brand-symbol sm">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="5" stroke="#2997ff" stroke-width="2" />
+              <polygon points="10,8 16,12 10,16" fill="#2997ff" />
+            </svg>
+          </span>
+          <span class="footer-title">Summarize AI</span>
+        </div>
+        <p class="footer-note">
+          Copyright &copy; 2026 Summarize AI. Built with state-of-the-art neural speech transcription &amp; LLM intelligence. Designed with precision.
+        </p>
+        <div class="footer-links">
+          <a href="#hero">Back to Top</a>
+          <a href="#summarizer">Summarizer</a>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+        </div>
       </div>
     </footer>
 
-    <script src="/static/app.js?t=apple_macbook_official_final_v1"></script>
+    <script src="/static/app.js?t=v2_ai_video_final"></script>
+    <script>
+      // Quick shortcut helper for Upload button in nav
+      const uploadNav = document.getElementById("navUploadLink");
+      if (uploadNav) {
+        uploadNav.addEventListener("click", (e) => {
+          e.preventDefault();
+          const fileTab = document.querySelector('[data-tab="file"]');
+          if (fileTab) fileTab.click();
+          const sumSec = document.getElementById("summarizer");
+          if (sumSec) sumSec.scrollIntoView({ behavior: "smooth" });
+        });
+      }
+    </script>
   </body>
 </html>

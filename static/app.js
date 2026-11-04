@@ -96,8 +96,12 @@ async function loadHealth() {
       ? "Whisper ready"
       : "captions-only (add API key for uploads)";
     engineStatus.textContent = `Engine: ${data.llm} · ${whisper}`;
+    const navBadge = document.getElementById("navStatusBadge");
+    if (navBadge) navBadge.textContent = `${data.llm} Active`;
   } catch {
     engineStatus.textContent = "Engine: offline — start the server, then refresh";
+    const navBadge = document.getElementById("navStatusBadge");
+    if (navBadge) navBadge.textContent = "Engine Offline";
   }
 }
 loadHealth();

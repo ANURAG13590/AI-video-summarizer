@@ -278,7 +278,7 @@ def _chat(system: str, user: str) -> str:
         from groq import Groq
 
         client = Groq(api_key=key, timeout=120)
-        model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+        model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
         resp = client.chat.completions.create(
             model=model,
             temperature=0.3,

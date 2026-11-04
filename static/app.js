@@ -101,7 +101,7 @@ function getApiUrl(endpoint) {
 /* ─── Engine health ─── */
 async function loadHealth() {
   try {
-    const res  = await fetch(getApiUrl("/api/health"));
+    const res  = await fetch(getApiUrl("/health"));
     const data = await res.json();
     const whisper = data.whisper
       ? "Whisper ready"
@@ -310,7 +310,7 @@ urlForm.addEventListener("submit", async (event) => {
   setBusy(true, "Fetching captions and writing the summary — long videos without subtitles can take a few minutes…");
   try {
     const style = urlForm.querySelector('input[name="style"]:checked').value;
-    const data  = await postJson("/api/summarize-url", { url, style });
+    const data  = await postJson("/summarize-url", { url, style });
     render(data);
   } catch (err) {
     showError(friendlyError(err));
@@ -330,7 +330,7 @@ fileForm.addEventListener("submit", async (event) => {
     const form  = new FormData();
     form.append("file", file);
     form.append("style", style);
-    const res  = await fetch(getApiUrl("/api/summarize-file"), { method: "POST", body: form });
+    const res  = await fetch(getApiUrl("/summarize-file"), { method: "POST", body: form });
     if (!res.ok) {
       if (res.status === 404 || res.status === 405) {
         if (window.location.hostname.endsWith("github.io") && !localStorage.getItem("ai_backend_url")) {

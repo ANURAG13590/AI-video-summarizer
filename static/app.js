@@ -89,7 +89,7 @@ function updateFileLabel(name) {
 
 /* ─── 24/7 Cloud API URL Resolution ─── */
 const CLOUD_BACKENDS = [
-  "https://phone-optimize-ground-dealt.trycloudflare.com",
+  "https://baths-characterization-nominated-proportion.trycloudflare.com",
   "https://ai-video-summarizer-qx.vercel.app",
   "https://ai-video-summarizer-zv8y.vercel.app"
 ];
@@ -133,7 +133,7 @@ async function loadHealth() {
   // Try cloud backends with auto-failover
   for (const b of CLOUD_BACKENDS) {
     try {
-      const res = await fetch(b + "/api/health", { signal: AbortSignal.timeout(4000) });
+      const res = await fetch(b + "/api/health", { signal: AbortSignal.timeout(6000) });
       if (res.ok) {
         const data = await res.json();
         activeBackend = b;
@@ -320,21 +320,42 @@ function looksLikeYouTubeUrl(value) {
   return /(?:youtube(?:-nocookie)?\.com|youtu\.be)/i.test(normalized);
 }
 
-/* ─── API call ─── */
+/* ─── API call with auto-retry ─── */
 async function postJson(url, body) {
-  const target = getApiUrl(url);
-  const res  = await fetch(target, {
+  if (window.location.hostname.endsWith("github.io")) {
+    const custom = localStorage.getItem("ai_backend_url");
+    const ordered = custom
+      ? [custom.replace(/\/+$/, "")]
+      : [activeBackend, ...CLOUD_BACKENDS.filter(b => b !== activeBackend)];
+    let lastErr = null;
+    for (const backend of ordered) {
+      try {
+        const res = await fetch(backend + url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(65000),
+        });
+        if (res.ok) {
+          activeBackend = backend;
+          return await res.json().catch(() => ({}));
+        }
+        const d = await res.json().catch(() => ({}));
+        lastErr = new Error(formatDetail(d.detail) || "Failed " + res.status);
+      } catch (err) { lastErr = err; }
+    }
+    throw lastErr || new Error("All backends failed.");
+  }
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-
-    const data = await res.json().catch(() => ({}));
-    throw new Error(formatDetail(data.detail) || `Request failed (${res.status})`);
+    const d = await res.json().catch(() => ({}));
+    throw new Error(formatDetail(d.detail) || "Failed " + res.status);
   }
-  const data = await res.json().catch(() => ({}));
-  return data;
+  return await res.json().catch(() => ({}));
 }
 
 /* ─── URL form submit ─── */
@@ -350,7 +371,7 @@ urlForm.addEventListener("submit", async (event) => {
   }
   const style = urlForm.querySelector('input[name="style"]:checked').value;
 
-  setBusy(true, "Analyzing video and writing structured summary…");
+  setBusy(true, "Connecting to AI engine and analyzing video… (may take 15-30 seconds)");
   try {
     const data = await postJson("/api/summarize-url", { url, style });
     render(data);

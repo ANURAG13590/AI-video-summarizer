@@ -1,4 +1,4 @@
-/* ─── DOM refs ─── */
+﻿/* ─── DOM refs ─── */
 const urlForm      = document.getElementById("urlForm");
 const fileForm     = document.getElementById("fileForm");
 const progressWrap = document.getElementById("progressWrap");
@@ -89,7 +89,7 @@ function updateFileLabel(name) {
 
 /* ─── 24/7 Cloud API URL Resolution ─── */
 const CLOUD_BACKENDS = [
-  "https://survivor-hill-rock-feed.trycloudflare.com",
+  "https://phone-optimize-ground-dealt.trycloudflare.com",
   "https://ai-video-summarizer-qx.vercel.app",
   "https://ai-video-summarizer-zv8y.vercel.app"
 ];

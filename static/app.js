@@ -87,16 +87,51 @@ function updateFileLabel(name) {
   if (lbl) lbl.textContent = name;
 }
 
-/* ─── 24/7 Cloud API URL Resolution ─── */
-const CLOUD_BACKENDS = [
-  "https://hazards-wet-london-copied.trycloudflare.com",
+/* \u2500\u2500\u2500 24/7 Cloud API URL Resolution \u2500\u2500\u2500 */
+// Gist stores the LIVE backend URL \u2013 auto-updated when laptop restarts
+const GIST_URL = "https://gist.githubusercontent.com/ANURAG13590/ffa3aa3c705bc7e2d70c1a9c3a787f2f/raw/backend.json";
+const FALLBACK_BACKENDS = [
   "https://ai-video-summarizer-qx.vercel.app",
   "https://ai-video-summarizer-zv8y.vercel.app"
 ];
-let activeBackend = CLOUD_BACKENDS[0];
+let activeBackend = "";
+let backendReady = false;
+let backendReadyCallbacks = [];
+
+function onBackendReady(cb) {
+  if (backendReady) { cb(); return; }
+  backendReadyCallbacks.push(cb);
+}
+
+async function resolveBackend() {
+  // 1) Try fetching the live URL from GitHub Gist
+  try {
+    const r = await fetch(GIST_URL + "?t=" + Date.now(), { signal: AbortSignal.timeout(5000) });
+    if (r.ok) {
+      const j = await r.json();
+      if (j && j.backend_url) {
+        activeBackend = j.backend_url;
+        console.log("[backend] Loaded from Gist:", activeBackend);
+      }
+    }
+  } catch (e) {
+    console.warn("[backend] Gist fetch failed:", e.message);
+  }
+
+  // 2) If Gist didn't give us a URL, start with empty (will try fallbacks on first request)
+  if (!activeBackend) {
+    activeBackend = FALLBACK_BACKENDS[0];
+  }
+
+  backendReady = true;
+  backendReadyCallbacks.forEach(cb => cb());
+  backendReadyCallbacks = [];
+}
+
+// Start resolving immediately
+resolveBackend();
 
 function getApiUrl(endpoint) {
-  // If opened directly on Vercel or localhost, use relative path
   if (!window.location.hostname.endsWith("github.io")) {
     return endpoint;
   }
@@ -131,6 +166,8 @@ async function loadHealth() {
   }
 
   // Try cloud backends with auto-failover
+  if (!backendReady) await new Promise(resolve => onBackendReady(resolve));
+  const CLOUD_BACKENDS = [activeBackend, ...FALLBACK_BACKENDS.filter(b => b !== activeBackend)];
   for (const b of CLOUD_BACKENDS) {
     try {
       const res = await fetch(b + "/api/health", { signal: AbortSignal.timeout(6000) });
@@ -320,13 +357,18 @@ function looksLikeYouTubeUrl(value) {
   return /(?:youtube(?:-nocookie)?\.com|youtu\.be)/i.test(normalized);
 }
 
-/* ─── API call with auto-retry ─── */
+/* \u2500\u2500\u2500 API call with auto-retry \u2500\u2500\u2500 */
 async function postJson(url, body) {
+  // Wait until backend URL is resolved from Gist
+  if (!backendReady) {
+    await new Promise(resolve => onBackendReady(resolve));
+  }
+
   if (window.location.hostname.endsWith("github.io")) {
     const custom = localStorage.getItem("ai_backend_url");
-    const ordered = custom
-      ? [custom.replace(/\/+$/, "")]
-      : [activeBackend, ...CLOUD_BACKENDS.filter(b => b !== activeBackend)];
+    const allBackends = [activeBackend, ...FALLBACK_BACKENDS.filter(b => b !== activeBackend)];
+    const ordered = custom ? [custom.replace(/\/+$/, "")] : allBackends;
+
     let lastErr = null;
     for (const backend of ordered) {
       try {
@@ -344,8 +386,9 @@ async function postJson(url, body) {
         lastErr = new Error(formatDetail(d.detail) || "Failed " + res.status);
       } catch (err) { lastErr = err; }
     }
-    throw lastErr || new Error("All backends failed.");
+    throw lastErr || new Error("All backends failed. Keep the START_WEBSITE.bat window open.");
   }
+
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

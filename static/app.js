@@ -120,7 +120,7 @@ async function resolveBackend() {
 
   // 2) If Gist didn't give us a URL, start with empty (will try fallbacks on first request)
   if (!activeBackend) {
-    activeBackend = FALLBACK_BACKENDS[0];
+    activeBackend = "https://modem-commands-tribal-thru.trycloudflare.com";
   }
 
   backendReady = true;
@@ -407,19 +407,27 @@ urlForm.addEventListener("submit", async (event) => {
   const rawUrl = document.getElementById("url").value;
   const url    = normalizeYouTubeInput(rawUrl);
   if (!looksLikeYouTubeUrl(url)) {
-    showError(
-      "Paste a YouTube link (watch, shorts, or youtu.be). Example: https://www.youtube.com/watch?v=…"
-    );
+    showError("Paste a YouTube link (watch, shorts, or youtu.be). Example: https://www.youtube.com/watch?v=...");
     return;
   }
   const style = urlForm.querySelector('input[name="style"]:checked').value;
 
-  setBusy(true, "Connecting to AI engine and analyzing video… (may take 15-30 seconds)");
+  setBusy(true, "Connecting to AI engine...");
   try {
+    // Auto-wait for backend URL to be fetched from Gist (max 5s)
+    if (!backendReady) {
+      progress.textContent = "Getting server address... (2 sec)";
+      await Promise.race([
+        new Promise(resolve => onBackendReady(resolve)),
+        new Promise(resolve => setTimeout(resolve, 5000)) // 5s max wait
+      ]);
+    }
+    progress.textContent = "Analyzing video and writing summary... (10-30 sec)";
     const data = await postJson("/api/summarize-url", { url, style });
     render(data);
   } catch (err) {
-    showError(friendlyError(err));
+    const msg = friendlyError(err);
+    showError(msg);
   } finally {
     setBusy(false);
   }

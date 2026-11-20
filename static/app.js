@@ -91,10 +91,11 @@ function updateFileLabel(name) {
 // Gist stores the LIVE backend URL \u2013 auto-updated when laptop restarts
 const GIST_URL = "https://gist.githubusercontent.com/ANURAG13590/ffa3aa3c705bc7e2d70c1a9c3a787f2f/raw/backend.json";
 const FALLBACK_BACKENDS = [
+  "https://modem-commands-tribal-thru.trycloudflare.com",
   "https://ai-video-summarizer-qx.vercel.app",
   "https://ai-video-summarizer-zv8y.vercel.app"
 ];
-let activeBackend = "";
+let activeBackend = "https://modem-commands-tribal-thru.trycloudflare.com"; // Set immediately so first click always works
 let backendReady = false;
 let backendReadyCallbacks = [];
 
